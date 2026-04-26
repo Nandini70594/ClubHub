@@ -1,16 +1,26 @@
-# clubflow
+Institute ERP — Mobile App
+A Flutter mobile application for managing college event workflows, including event proposals, multi-level approvals, and resource permission requests.
+Tech Stack
 
-A new Flutter project.
+Flutter & Dart
+Riverpod — state management
+Go Router — navigation
+Supabase — backend, auth, and storage
 
-## Getting Started
+Getting Started
+bashgit clone https://github.com/Nandini70594/ClubHub.git
+cd YOUR_REPO_NAME
+flutter pub get
+flutter run
 
-This project is a starting point for a Flutter application.
+Add your Supabase URL and anon key to your config before running.
 
-A few resources to get you started if this is your first Flutter project:
+Features
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+Event proposal creation and multi-stage approval workflow
+Resource permission requests with document uploads
+Role-based dashboards for approvers and coordinators
+Event archive with search
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+License
+For internal/academic use.
