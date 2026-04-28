@@ -12,6 +12,7 @@ class BudgetModel {
   final String? approvedAt;
   final String? remarks;
   final String? createdAt;
+  final String? clubName;
 
   BudgetModel({
     required this.id,
@@ -27,9 +28,16 @@ class BudgetModel {
     this.approvedAt,
     this.remarks,
     this.createdAt,
+    this.clubName,
   });
 
   factory BudgetModel.fromMap(Map<String, dynamic> map) {
+    // Extract club name from joined data
+    String? clubName;
+    if (map['events'] != null && map['events']['clubs'] != null) {
+      clubName = map['events']['clubs']['name'] as String?;
+    }
+
     return BudgetModel(
       id: map['id'] as String,
       eventId: map['event_id'] as String,
@@ -44,6 +52,7 @@ class BudgetModel {
       approvedAt: map['approved_at'] as String?,
       remarks: map['remarks'] as String?,
       createdAt: map['created_at'] as String?,
+      clubName: clubName,
     );
   }
 }

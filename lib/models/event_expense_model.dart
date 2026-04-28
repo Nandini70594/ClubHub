@@ -9,6 +9,7 @@ class EventExpenseModel {
   final String? approvedAt;
   final String? remarks;
   final String? createdAt;
+  final String? clubName;
 
   EventExpenseModel({
     required this.id,
@@ -21,9 +22,15 @@ class EventExpenseModel {
     this.approvedAt,
     this.remarks,
     this.createdAt,
+    this.clubName,
   });
 
   factory EventExpenseModel.fromMap(Map<String, dynamic> map) {
+    String? clubName;
+    if (map['events'] != null && map['events']['clubs'] != null) {
+      clubName = map['events']['clubs']['name'] as String?;
+    }
+
     return EventExpenseModel(
       id: map['id'] as String,
       eventId: map['event_id'] as String,
@@ -35,6 +42,7 @@ class EventExpenseModel {
       approvedAt: map['approved_at'] as String?,
       remarks: map['remarks'] as String?,
       createdAt: map['created_at'] as String?,
+      clubName: clubName,
     );
   }
 }

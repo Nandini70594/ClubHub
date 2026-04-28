@@ -89,7 +89,15 @@ class PostEventService {
   Future<List<EventExpenseModel>> getPendingExpenses() async {
     final data = await _client
         .from('event_expenses')
-        .select()
+        .select('''
+          *,
+          events!inner(
+            club_id,
+            clubs!inner(
+              name
+            )
+          )
+        ''')
         .eq('status', 'pending')
         .order('created_at', ascending: false);
 
@@ -104,7 +112,15 @@ class PostEventService {
 
     final data = await _client
         .from('event_expenses')
-        .select()
+        .select('''
+          *,
+          events!inner(
+            club_id,
+            clubs!inner(
+              name
+            )
+          )
+        ''')
         .eq('approved_by', userId)
         .inFilter('status', ['approved', 'changes_requested', 'rejected'])
         .order('approved_at', ascending: false);

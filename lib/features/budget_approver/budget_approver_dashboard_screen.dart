@@ -1,184 +1,10 @@
-// import 'package:flutter/material.dart';
-// import 'package:flutter_riverpod/flutter_riverpod.dart';
-
-// import '../../models/budget_model.dart';
-// import '../../providers/auth_provider.dart';
-// import '../approver/budget_review_screen.dart';
-
-// class BudgetApproverDashboardScreen extends ConsumerStatefulWidget {
-//   const BudgetApproverDashboardScreen({super.key});
-
-//   @override
-//   ConsumerState<BudgetApproverDashboardScreen> createState() =>
-//       _BudgetApproverDashboardScreenState();
-// }
-
-// class _BudgetApproverDashboardScreenState
-//     extends ConsumerState<BudgetApproverDashboardScreen> {
-//   int _reloadKey = 0;
-
-//   Future<void> _refresh() async {
-//     setState(() {
-//       _reloadKey++;
-//     });
-//   }
-
-//   String _formatDateTime(String? dateTimeStr) {
-//     if (dateTimeStr == null || dateTimeStr.isEmpty) return '';
-//     final dt = DateTime.parse(dateTimeStr).toLocal();
-//     final hour = dt.hour % 12 == 0 ? 12 : dt.hour % 12;
-//     final minute = dt.minute.toString().padLeft(2, '0');
-//     final amPm = dt.hour >= 12 ? 'PM' : 'AM';
-//     return '${dt.day}/${dt.month}/${dt.year} • $hour:$minute $amPm';
-//   }
-
-//   @override
-//   Widget build(BuildContext context) {
-//     final pendingFuture = ref.read(eventServiceProvider).getPendingBudgets();
-//     final reviewedFuture =
-//         ref.read(eventServiceProvider).getReviewedBudgetsForCurrentApprover();
-
-//     return DefaultTabController(
-//       length: 2,
-//       child: Scaffold(
-//         appBar: AppBar(
-//           title: const Text('Budget Approver Dashboard'),
-//           bottom: const TabBar(
-//             tabs: [
-//               Tab(text: 'Pending'),
-//               Tab(text: 'Reviewed'),
-//             ],
-//           ),
-//         ),
-//         body: TabBarView(
-//           children: [
-//             FutureBuilder<List<BudgetModel>>(
-//               key: ValueKey('budget_pending_$_reloadKey'),
-//               future: pendingFuture,
-//               builder: (context, snapshot) {
-//                 if (snapshot.connectionState == ConnectionState.waiting) {
-//                   return const Center(child: CircularProgressIndicator());
-//                 }
-//                 if (snapshot.hasError) {
-//                   return Center(child: Text('Error: ${snapshot.error}'));
-//                 }
-//                 final budgets = snapshot.data ?? [];
-//                 if (budgets.isEmpty) {
-//                   return RefreshIndicator(
-//                     onRefresh: _refresh,
-//                     child: ListView(
-//                       physics: const AlwaysScrollableScrollPhysics(),
-//                       children: const [
-//                         SizedBox(height: 200),
-//                         Center(child: Text('No pending budgets')),
-//                       ],
-//                     ),
-//                   );
-//                 }
-//                 return RefreshIndicator(
-//                   onRefresh: _refresh,
-//                   child: ListView.builder(
-//                     physics: const AlwaysScrollableScrollPhysics(),
-//                     itemCount: budgets.length,
-//                     itemBuilder: (context, index) {
-//                       final budget = budgets[index];
-//                       return Card(
-//                         margin: const EdgeInsets.all(12),
-//                         child: ListTile(
-//                           onTap: () async {
-//                             final changed = await Navigator.push<bool>(
-//                               context,
-//                               MaterialPageRoute(
-//                                 builder: (_) => BudgetReviewScreen(budget: budget),
-//                               ),
-//                             );
-//                             if (changed == true) {
-//                               await _refresh();
-//                             }
-//                           },
-//                           title: Text('₹${budget.totalRequested}'),
-//                           subtitle: Text(
-//                             '${budget.status} • ${budget.fileName ?? 'No file'}',
-//                           ),
-//                           trailing:
-//                               const Icon(Icons.arrow_forward_ios, size: 16),
-//                         ),
-//                       );
-//                     },
-//                   ),
-//                 );
-//               },
-//             ),
-//             FutureBuilder<List<BudgetModel>>(
-//               key: ValueKey('budget_reviewed_$_reloadKey'),
-//               future: reviewedFuture,
-//               builder: (context, snapshot) {
-//                 if (snapshot.connectionState == ConnectionState.waiting) {
-//                   return const Center(child: CircularProgressIndicator());
-//                 }
-//                 if (snapshot.hasError) {
-//                   return Center(child: Text('Error: ${snapshot.error}'));
-//                 }
-//                 final budgets = snapshot.data ?? [];
-//                 if (budgets.isEmpty) {
-//                   return RefreshIndicator(
-//                     onRefresh: _refresh,
-//                     child: ListView(
-//                       physics: const AlwaysScrollableScrollPhysics(),
-//                       children: const [
-//                         SizedBox(height: 200),
-//                         Center(child: Text('No reviewed budgets')),
-//                       ],
-//                     ),
-//                   );
-//                 }
-//                 return RefreshIndicator(
-//                   onRefresh: _refresh,
-//                   child: ListView.builder(
-//                     physics: const AlwaysScrollableScrollPhysics(),
-//                     itemCount: budgets.length,
-//                     itemBuilder: (context, index) {
-//                       final budget = budgets[index];
-//                       return Card(
-//                         margin: const EdgeInsets.all(12),
-//                         child: ListTile(
-//                           onTap: () async {
-//                             await Navigator.push(
-//                               context,
-//                               MaterialPageRoute(
-//                                 builder: (_) => BudgetReviewScreen(budget: budget),
-//                               ),
-//                             );
-//                           },
-//                           title: Text('₹${budget.totalRequested}'),
-//                           subtitle: Text(
-//                             '${budget.status} • ${budget.approvalNumber ?? 'No approval no.'}',
-//                           ),
-//                           trailing: Text(
-//                             budget.approvedAt != null
-//                                 ? _formatDateTime(budget.approvedAt)
-//                                 : '',
-//                             style: const TextStyle(fontSize: 11),
-//                           ),
-//                         ),
-//                       );
-//                     },
-//                   ),
-//                 );
-//               },
-//             ),
-//           ],
-//         ),
-//       ),
-//     );
-//   }
-// }
-
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:url_launcher/url_launcher.dart';
+
 import '../../models/budget_model.dart';
 import '../../providers/auth_provider.dart';
+import '../../widgets/app_scaffold.dart';
 import '../approver/budget_review_screen.dart';
 
 class BudgetApproverDashboardScreen extends ConsumerStatefulWidget {
@@ -190,11 +16,25 @@ class BudgetApproverDashboardScreen extends ConsumerStatefulWidget {
 }
 
 class _BudgetApproverDashboardScreenState
-    extends ConsumerState<BudgetApproverDashboardScreen> {
+    extends ConsumerState<BudgetApproverDashboardScreen>
+    with SingleTickerProviderStateMixin {
   int _reloadKey = 0;
+  late final TabController _tabController;
+
+  @override
+  void initState() {
+    super.initState();
+    _tabController = TabController(length: 2, vsync: this);
+  }
+
+  @override
+  void dispose() {
+    _tabController.dispose();
+    super.dispose();
+  }
 
   Future<void> _refresh() async {
-    setState(() { _reloadKey++; });
+    setState(() => _reloadKey++);
   }
 
   String _formatDateTime(String? dateTimeStr) {
@@ -206,315 +46,445 @@ class _BudgetApproverDashboardScreenState
     return '${dt.day}/${dt.month}/${dt.year} • $hour:$minute $amPm';
   }
 
+  Future<void> _openBudgetFile(BudgetModel budget) async {
+    final storagePath = budget.storagePath;
+    if (storagePath == null || storagePath.isEmpty) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('No file available to view.')),
+      );
+      return;
+    }
+
+    try {
+      final url = await ref
+          .read(storageServiceProvider)
+          .getSignedFileUrl(storagePath);
+
+      final uri = Uri.parse(url);
+      final launched = await launchUrl(uri, mode: LaunchMode.externalApplication);
+
+      if (!launched && mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Could not open file.')),
+        );
+      }
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error opening file: $e')),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final pendingFuture = ref.read(eventServiceProvider).getPendingBudgets();
-    final reviewedFuture = ref.read(eventServiceProvider).getReviewedBudgetsForCurrentApprover();
+    final reviewedFuture =
+        ref.read(eventServiceProvider).getReviewedBudgetsForCurrentApprover();
 
-    return DefaultTabController(
-      length: 2,
-      child: Scaffold(
-        backgroundColor: const Color(0xFFF4F6FB),
-        appBar: AppBar(
-          backgroundColor: Colors.white,
-          elevation: 0,
-          surfaceTintColor: Colors.transparent,
-          title: const Text(
-            'Budget Approvals',
-            style: TextStyle(fontSize: 17, fontWeight: FontWeight.w700, color: Color(0xFF1A1F36)),
-          ),
-          bottom: PreferredSize(
-            preferredSize: const Size.fromHeight(49),
-            child: Column(
-              children: [
-                Divider(height: 1, color: Colors.grey.shade200),
-                TabBar(
-                  labelColor: const Color(0xFF3B5BDB),
-                  unselectedLabelColor: Colors.grey.shade500,
-                  labelStyle: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600),
-                  unselectedLabelStyle: const TextStyle(fontSize: 13, fontWeight: FontWeight.w400),
-                  indicatorColor: const Color(0xFF3B5BDB),
-                  indicatorWeight: 2.5,
-                  tabs: const [Tab(text: 'Pending'), Tab(text: 'Reviewed')],
-                ),
+    return AppScaffold(
+      title: 'Budget Approver',
+      currentRoute: '/budget-approver',
+      child: Column(
+        children: [
+          Container(
+            color: Colors.white,
+            child: TabBar(
+              controller: _tabController,
+              labelColor: const Color(0xFF3B5BDB),
+              unselectedLabelColor: const Color(0xFF6B7280),
+              indicatorColor: const Color(0xFF3B5BDB),
+              indicatorWeight: 3,
+              labelStyle: const TextStyle(
+                fontWeight: FontWeight.w600,
+                fontSize: 14,
+              ),
+              tabs: const [
+                Tab(text: 'Pending'),
+                Tab(text: 'Reviewed'),
               ],
             ),
           ),
-        ),
-        body: TabBarView(
-          children: [
-            // Pending tab
+          Expanded(
+            child: TabBarView(
+              controller: _tabController,
+              children: [
             FutureBuilder<List<BudgetModel>>(
               key: ValueKey('budget_pending_$_reloadKey'),
               future: pendingFuture,
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
-                  return const Center(child: CircularProgressIndicator(color: Color(0xFF3B5BDB)));
+                  return const Center(
+                    child: CircularProgressIndicator(color: Color(0xFF3B5BDB)),
+                  );
                 }
                 if (snapshot.hasError) {
-                  return _ErrorView(message: snapshot.error.toString());
+                  return Center(child: Text('Error: ${snapshot.error}'));
                 }
                 final budgets = snapshot.data ?? [];
                 if (budgets.isEmpty) {
-                  return _EmptyView(onRefresh: _refresh, message: 'No pending budgets');
+                  return _emptyState('No pending budgets');
                 }
                 return RefreshIndicator(
-                  color: const Color(0xFF3B5BDB),
                   onRefresh: _refresh,
+                  color: const Color(0xFF3B5BDB),
                   child: ListView.builder(
                     physics: const AlwaysScrollableScrollPhysics(),
-                    padding: const EdgeInsets.all(16),
+                    padding: const EdgeInsets.symmetric(vertical: 12),
                     itemCount: budgets.length,
-                    itemBuilder: (context, index) {
-                      final budget = budgets[index];
-                      return _BudgetPendingCard(
-                        budget: budget,
-                        onTap: () async {
-                          final changed = await Navigator.push<bool>(
-                            context,
-                            MaterialPageRoute(builder: (_) => BudgetReviewScreen(budget: budget)),
-                          );
-                          if (changed == true) await _refresh();
-                        },
-                      );
-                    },
+                    itemBuilder: (context, index) =>
+                        _pendingBudgetCard(budgets[index], context),
                   ),
                 );
               },
             ),
-            // Reviewed tab
+
+            // ── Reviewed Tab ──
             FutureBuilder<List<BudgetModel>>(
               key: ValueKey('budget_reviewed_$_reloadKey'),
               future: reviewedFuture,
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
-                  return const Center(child: CircularProgressIndicator(color: Color(0xFF3B5BDB)));
+                  return const Center(
+                    child: CircularProgressIndicator(color: Color(0xFF3B5BDB)),
+                  );
                 }
                 if (snapshot.hasError) {
-                  return _ErrorView(message: snapshot.error.toString());
+                  return Center(child: Text('Error: ${snapshot.error}'));
                 }
                 final budgets = snapshot.data ?? [];
                 if (budgets.isEmpty) {
-                  return _EmptyView(onRefresh: _refresh, message: 'No reviewed budgets');
+                  return _emptyState('No reviewed budgets');
                 }
                 return RefreshIndicator(
-                  color: const Color(0xFF3B5BDB),
                   onRefresh: _refresh,
+                  color: const Color(0xFF3B5BDB),
                   child: ListView.builder(
                     physics: const AlwaysScrollableScrollPhysics(),
-                    padding: const EdgeInsets.all(16),
+                    padding: const EdgeInsets.symmetric(vertical: 12),
                     itemCount: budgets.length,
-                    itemBuilder: (context, index) {
-                      final budget = budgets[index];
-                      return _BudgetReviewedCard(
-                        budget: budget,
-                        formattedDate: _formatDateTime(budget.approvedAt),
-                        onTap: () async {
-                          await Navigator.push(
-                            context,
-                            MaterialPageRoute(builder: (_) => BudgetReviewScreen(budget: budget)),
-                          );
-                        },
-                      );
-                    },
+                    itemBuilder: (context, index) =>
+                        _reviewedBudgetCard(budgets[index], context),
                   ),
                 );
               },
             ),
           ],
-        ),
-      ),
-    );
-  }
-}
-
-// ── Sub-widgets ──────────────────────────────────────────────────────────────
-
-class _BudgetPendingCard extends StatelessWidget {
-  final BudgetModel budget;
-  final VoidCallback onTap;
-  const _BudgetPendingCard({required this.budget, required this.onTap});
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 10),
-      child: Material(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        child: InkWell(
-          onTap: onTap,
-          borderRadius: BorderRadius.circular(12),
-          child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: Colors.grey.shade100),
-            ),
-            child: Row(
-              children: [
-                Container(
-                  width: 44,
-                  height: 44,
-                  decoration: BoxDecoration(
-                    color: const Color(0xFFEEF2FF),
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  child: const Icon(Icons.account_balance_wallet_outlined, color: Color(0xFF3B5BDB), size: 20),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        '₹${budget.totalRequested}',
-                        style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w700, color: Color(0xFF1A1F36)),
-                      ),
-                      const SizedBox(height: 3),
-                      Text(
-                        budget.fileName ?? 'No file attached',
-                        style: TextStyle(fontSize: 12, color: Colors.grey.shade500),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ],
-                  ),
-                ),
-                _StatusChip(status: budget.status),
-                const SizedBox(width: 8),
-                Icon(Icons.arrow_forward_ios, size: 13, color: Colors.grey.shade400),
-              ],
             ),
           ),
-        ),
-      ),
-    );
-  }
-}
-
-class _BudgetReviewedCard extends StatelessWidget {
-  final BudgetModel budget;
-  final String formattedDate;
-  final VoidCallback onTap;
-  const _BudgetReviewedCard({required this.budget, required this.formattedDate, required this.onTap});
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 10),
-      child: Material(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        child: InkWell(
-          onTap: onTap,
-          borderRadius: BorderRadius.circular(12),
-          child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: Colors.grey.shade100),
-            ),
-            child: Row(
-              children: [
-                Container(
-                  width: 44,
-                  height: 44,
-                  decoration: BoxDecoration(
-                    color: const Color(0xFFF0FDF4),
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  child: const Icon(Icons.check_circle_outline, color: Color(0xFF16A34A), size: 20),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        '₹${budget.totalRequested}',
-                        style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w700, color: Color(0xFF1A1F36)),
-                      ),
-                      const SizedBox(height: 3),
-                      Text(
-                        budget.approvalNumber ?? 'No approval no.',
-                        style: TextStyle(fontSize: 12, color: Colors.grey.shade500),
-                      ),
-                    ],
-                  ),
-                ),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  children: [
-                    _StatusChip(status: budget.status),
-                    if (formattedDate.isNotEmpty) ...[
-                      const SizedBox(height: 4),
-                      Text(formattedDate, style: TextStyle(fontSize: 10, color: Colors.grey.shade400)),
-                    ],
-                  ],
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class _StatusChip extends StatelessWidget {
-  final String status;
-  const _StatusChip({required this.status});
-
-  @override
-  Widget build(BuildContext context) {
-    final s = status.toLowerCase();
-    Color bg; Color fg;
-    if (s.contains('approved')) { bg = const Color(0xFFF0FDF4); fg = const Color(0xFF16A34A); }
-    else if (s.contains('reject')) { bg = const Color(0xFFFEF2F2); fg = const Color(0xFFDC2626); }
-    else { bg = const Color(0xFFFFFBEB); fg = const Color(0xFFD97706); }
-
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-      decoration: BoxDecoration(color: bg, borderRadius: BorderRadius.circular(6)),
-      child: Text(status, style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: fg)),
-    );
-  }
-}
-
-class _EmptyView extends StatelessWidget {
-  final Future<void> Function() onRefresh;
-  final String message;
-  const _EmptyView({required this.onRefresh, required this.message});
-
-  @override
-  Widget build(BuildContext context) {
-    return RefreshIndicator(
-      color: const Color(0xFF3B5BDB),
-      onRefresh: onRefresh,
-      child: ListView(
-        physics: const AlwaysScrollableScrollPhysics(),
-        children: [
-          const SizedBox(height: 120),
-          Icon(Icons.inbox_outlined, size: 48, color: Colors.grey.shade300),
-          const SizedBox(height: 12),
-          Center(child: Text(message, style: TextStyle(fontSize: 14, color: Colors.grey.shade400))),
         ],
       ),
     );
   }
-}
 
-class _ErrorView extends StatelessWidget {
-  final String message;
-  const _ErrorView({required this.message});
+  Widget _emptyState(String message) {
+    return RefreshIndicator(
+      onRefresh: _refresh,
+      color: const Color(0xFF3B5BDB),
+      child: ListView(
+        physics: const AlwaysScrollableScrollPhysics(),
+        children: [
+          const SizedBox(height: 80),
+          Center(
+            child: Column(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(20),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF3B5BDB).withOpacity(0.1),
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Icon(
+                    Icons.account_balance_wallet_outlined,
+                    size: 40,
+                    color: Color(0xFF3B5BDB),
+                  ),
+                ),
+                const SizedBox(height: 16),
+                Text(
+                  message,
+                  style: const TextStyle(
+                    color: Color(0xFF6B7280),
+                    fontSize: 14,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 
-  @override
-  Widget build(BuildContext context) {
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.all(24),
-        child: Text('Error: $message', style: const TextStyle(color: Color(0xFFDC2626), fontSize: 13)),
+  Widget _pendingBudgetCard(BudgetModel budget, BuildContext context) {
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: Colors.grey.shade200),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: InkWell(
+        borderRadius: BorderRadius.circular(12),
+        onTap: () async {
+          final changed = await Navigator.push<bool>(
+            context,
+            MaterialPageRoute(
+              builder: (_) => BudgetReviewScreen(budget: budget),
+            ),
+          );
+          if (changed == true) await _refresh();
+        },
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Row(
+            children: [
+              Container(
+                width: 44,
+                height: 44,
+                decoration: BoxDecoration(
+                  gradient: const LinearGradient(
+                    colors: [Color(0xFF3B5BDB), Color(0xFF7091E6)],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: const Icon(
+                  Icons.account_balance_wallet_outlined,
+                  color: Colors.white,
+                  size: 22,
+                ),
+              ),
+              const SizedBox(width: 14),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Text(
+                            '₹${budget.totalRequested}',
+                            style: const TextStyle(
+                              color: Color(0xFF1A1F36),
+                              fontWeight: FontWeight.w600,
+                              fontSize: 14,
+                            ),
+                          ),
+                        ),
+                        if (budget.storagePath != null || budget.fileName != null)
+                          IconButton(
+                            onPressed: () => _openBudgetFile(budget),
+                            icon: const Icon(
+                              Icons.visibility,
+                              color: Color(0xFF3B5BDB),
+                              size: 20,
+                            ),
+                            tooltip: 'View Budget File',
+                          ),
+                      ],
+                    ),
+                    const SizedBox(height: 6),
+                    Row(
+                      children: [
+                        _statusBadge(budget.status),
+                        const SizedBox(width: 8),
+                        if (budget.clubName != null)
+                          Flexible(
+                            child: Text(
+                              budget.clubName!,
+                              style: const TextStyle(
+                                color: Color(0xFF6B7280),
+                                fontSize: 12,
+                              ),
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          )
+                        else
+                          const Text(
+                            'Budget File',
+                            style: TextStyle(
+                              color: Color(0xFF6B7280),
+                              fontSize: 12,
+                            ),
+                          ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(width: 8),
+              const Icon(
+                Icons.chevron_right_rounded,
+                color: Color(0xFF3B5BDB),
+                size: 22,
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _reviewedBudgetCard(BudgetModel budget, BuildContext context) {
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: Colors.grey.shade200),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: InkWell(
+        borderRadius: BorderRadius.circular(12),
+        onTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (_) => BudgetReviewScreen(budget: budget),
+            ),
+          );
+        },
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Row(
+            children: [
+              Container(
+                width: 44,
+                height: 44,
+                decoration: BoxDecoration(
+                  color: const Color(0xFF3B5BDB).withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: const Icon(
+                  Icons.task_alt_outlined,
+                  color: Color(0xFF3B5BDB),
+                  size: 22,
+                ),
+              ),
+              const SizedBox(width: 14),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Text(
+                            '₹${budget.totalRequested}',
+                            style: const TextStyle(
+                              color: Color(0xFF1A1F36),
+                              fontWeight: FontWeight.w600,
+                              fontSize: 14,
+                            ),
+                          ),
+                        ),
+                        if (budget.storagePath != null || budget.fileName != null)
+                          IconButton(
+                            onPressed: () => _openBudgetFile(budget),
+                            icon: const Icon(
+                              Icons.visibility,
+                              color: Color(0xFF3B5BDB),
+                              size: 20,
+                            ),
+                            tooltip: 'View Budget File',
+                          ),
+                      ],
+                    ),
+                    const SizedBox(height: 6),
+                    Row(
+                      children: [
+                        _statusBadge(budget.status),
+                        const SizedBox(width: 8),
+                        if (budget.clubName != null)
+                          Flexible(
+                            child: Text(
+                              budget.clubName!,
+                              style: const TextStyle(
+                                color: Color(0xFF6B7280),
+                                fontSize: 12,
+                              ),
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          )
+                        else
+                          const Text(
+                            'No club',
+                            style: TextStyle(
+                              color: Color(0xFF6B7280),
+                              fontSize: 12,
+                            ),
+                          ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(width: 8),
+              if (budget.approvedAt != null)
+                Text(
+                  _formatDateTime(budget.approvedAt),
+                  style: const TextStyle(
+                    color: Color(0xFF6B7280),
+                    fontSize: 11,
+                  ),
+                ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _statusBadge(String status) {
+    Color bg, fg;
+    switch (status.toLowerCase()) {
+      case 'approved':
+        bg = const Color(0xFF10B981).withOpacity(0.12);
+        fg = const Color(0xFF10B981);
+        break;
+      case 'rejected':
+        bg = const Color(0xFFEF4444).withOpacity(0.12);
+        fg = const Color(0xFFEF4444);
+        break;
+      case 'changes_requested':
+      case 'changes requested':
+        bg = const Color(0xFF6366F1).withOpacity(0.12);
+        fg = const Color(0xFF6366F1);
+        break;
+      default:
+        bg = const Color(0xFFF59E0B).withOpacity(0.12);
+        fg = const Color(0xFFF59E0B);
+    }
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+      decoration: BoxDecoration(
+        color: bg,
+        borderRadius: BorderRadius.circular(20),
+      ),
+      child: Text(
+        status.toUpperCase(),
+        style: TextStyle(
+          color: fg,
+          fontSize: 10,
+          fontWeight: FontWeight.w700,
+          letterSpacing: 0.4,
+        ),
       ),
     );
   }

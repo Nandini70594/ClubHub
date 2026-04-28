@@ -13,11 +13,11 @@ Future<void> main() async {
     anonKey: Env.supabaseAnonKey,
   );
 
-  runApp(const ProviderScope(child: ClubHubApp()));
+  runApp(const ProviderScope(child: ClubFlowApp()));
 }
 
-class ClubHubApp extends ConsumerWidget {
-  const ClubHubApp({super.key});
+class ClubFlowApp extends ConsumerWidget {
+  const ClubFlowApp({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -25,8 +25,15 @@ class ClubHubApp extends ConsumerWidget {
 
     return MaterialApp.router(
       debugShowCheckedModeBanner: false,
-      title: 'ClubHub',
+      title: 'ClubFlow',
       routerConfig: router,
+      theme: ThemeData(
+        fontFamily: 'Inter',
+        colorScheme: ColorScheme.fromSeed(
+          seedColor: const Color(0xFF3B5BDB),
+        ),
+        useMaterial3: true,
+      ),
     );
   }
 }

@@ -1,78 +1,17 @@
-// import 'package:flutter/material.dart';
-// import 'package:go_router/go_router.dart';
-
-// class BudgetApproverHomeScreen extends StatelessWidget {
-//   const BudgetApproverHomeScreen({super.key});
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return Scaffold(
-//       appBar: AppBar(
-//         title: const Text('Budget Approver Home'),
-//       ),
-//       body: Padding(
-//         padding: const EdgeInsets.all(16),
-//         child: Column(
-//           children: [
-//             Card(
-//               child: ListTile(
-//                 leading: const Icon(Icons.account_balance_wallet_outlined),
-//                 title: const Text('Budget Approval Requests'),
-//                 subtitle: const Text('Review event budget submissions'),
-//                 trailing: const Icon(Icons.arrow_forward_ios, size: 16),
-//                 onTap: () {
-//                   context.push('/budget-approver/budgets');
-//                 },
-//               ),
-//             ),
-//             const SizedBox(height: 12),
-//             Card(
-//               child: ListTile(
-//                 leading: const Icon(Icons.receipt_long_outlined),
-//                 title: const Text('Post Event Budget Proof Approval'),
-//                 subtitle: const Text('Review bills, invoices, CO and PO'),
-//                 trailing: const Icon(Icons.arrow_forward_ios, size: 16),
-//                 onTap: () {
-//                   context.push('/budget-approver/expenses');
-//                 },
-//               ),
-//             ),
-//           ],
-//         ),
-//       ),
-//     );
-//   }
-// }
-
-
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+
+import '../../widgets/app_scaffold.dart';
 
 class BudgetApproverHomeScreen extends StatelessWidget {
   const BudgetApproverHomeScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: const Color(0xFFF4F6FB),
-      appBar: AppBar(
-        backgroundColor: Colors.white,
-        elevation: 0,
-        surfaceTintColor: Colors.transparent,
-        title: const Text(
-          'Budget Approver',
-          style: TextStyle(
-            fontSize: 17,
-            fontWeight: FontWeight.w700,
-            color: Color(0xFF1A1F36),
-          ),
-        ),
-        bottom: PreferredSize(
-          preferredSize: const Size.fromHeight(1),
-          child: Divider(height: 1, color: Colors.grey.shade200),
-        ),
-      ),
-      body: Padding(
+    return AppScaffold(
+      title: 'Budget Approver',
+      currentRoute: '/budget-approver',
+      child: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,

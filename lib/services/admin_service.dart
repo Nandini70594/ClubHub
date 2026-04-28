@@ -1,14 +1,79 @@
+// import 'package:supabase_flutter/supabase_flutter.dart';
+
+// import '../models/app_user.dart';
+// import '../models/club_model.dart';
+
+// class AdminService {
+//   final SupabaseClient _client = Supabase.instance.client;
+
+//   Future<List<ClubModel>> getClubs() async {
+//     final data = await _client.from('clubs').select().order('club_name');
+
+//     return (data as List)
+//         .map((e) => ClubModel.fromMap(e as Map<String, dynamic>))
+//         .toList();
+//   }
+
+//   Future<List<AppUser>> getUsers() async {
+//     final data = await _client.from('users').select().order('full_name');
+
+//     return (data as List)
+//         .map((e) => AppUser.fromMap(e as Map<String, dynamic>))
+//         .toList();
+//   }
+
+//   Future<void> createClub({
+//     required String clubName,
+//     required String clubCode,
+//   }) async {
+//     await _client.from('clubs').insert({
+//       'club_name': clubName,
+//       'club_code': clubCode,
+//     });
+//   }
+
+//   Future<void> createUserProfile({
+//     required String authUserId,
+//     required String email,
+//     required String role,
+//     required String fullName,
+//     String? department,
+//     String? clubId,
+//   }) async {
+//     await _client.from('users').insert({
+//       'id': authUserId,
+//       'email': email,
+//       'role': role,
+//       'full_name': fullName,
+//       'department': department,
+//       'club_id': clubId,
+//     });
+//   }
+
+//   Future<void> assignFacultyToClub({
+//     required String clubId,
+//     required String facultyUserId,
+//   }) async {
+//     await _client
+//         .from('clubs')
+//         .update({'faculty_mentor_id': facultyUserId})
+//         .eq('id', clubId);
+//   }
+// }
+
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../models/app_user.dart';
 import '../models/club_model.dart';
 
+final adminServiceProvider = Provider<AdminService>((ref) => AdminService());
+
 class AdminService {
   final SupabaseClient _client = Supabase.instance.client;
 
   Future<List<ClubModel>> getClubs() async {
-    final data = await _client.from('clubs').select().order('club_name');
-
+    final data = await _client.from('clubs').select().order('name');
     return (data as List)
         .map((e) => ClubModel.fromMap(e as Map<String, dynamic>))
         .toList();
@@ -16,7 +81,6 @@ class AdminService {
 
   Future<List<AppUser>> getUsers() async {
     final data = await _client.from('users').select().order('full_name');
-
     return (data as List)
         .map((e) => AppUser.fromMap(e as Map<String, dynamic>))
         .toList();
@@ -25,11 +89,18 @@ class AdminService {
   Future<void> createClub({
     required String clubName,
     required String clubCode,
+    String? department, // NEW — nullable, maps to DB column
   }) async {
-    await _client.from('clubs').insert({
-      'club_name': clubName,
+    final payload = <String, dynamic>{
+      'name': clubName,
       'club_code': clubCode,
-    });
+    };
+    // Only include department if provided (avoids sending null for columns
+    // that might not exist in older schema versions)
+    if (department != null && department.isNotEmpty) {
+      payload['department'] = department;
+    }
+    await _client.from('clubs').insert(payload);
   }
 
   Future<void> createUserProfile({
@@ -45,8 +116,9 @@ class AdminService {
       'email': email,
       'role': role,
       'full_name': fullName,
-      'department': department,
-      'club_id': clubId,
+      if (department != null && department.isNotEmpty)
+        'department': department,
+      if (clubId != null) 'club_id': clubId,
     });
   }
 
@@ -56,7 +128,6 @@ class AdminService {
   }) async {
     await _client
         .from('clubs')
-        .update({'faculty_mentor_id': facultyUserId})
-        .eq('id', clubId);
+        .update({'faculty_mentor_id': facultyUserId}).eq('id', clubId);
   }
 }

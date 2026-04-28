@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../core/router/app_router.dart';
 import '../../providers/auth_provider.dart';
 
 class SplashScreen extends ConsumerStatefulWidget {
@@ -20,36 +21,21 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
 
   Future<void> _checkUser() async {
     final profile = await ref.read(currentUserProfileProvider.future);
-
     if (!mounted) return;
 
-    if (profile == null) {
-      context.go('/login');
-      return;
-    }
+    final route = initialRouteForRole(profile?.role);
 
-    switch (profile.role) {
-      case 'club_lead':
-        context.go('/club');
-        break;
-      case 'proposal_approver':
-        context.go('/proposal-approver');
-        break;
-      case 'budget_approver':
-        context.go('/budget-approver');
-        break;
-      case 'admin':
-        context.go('/admin');
-        break;
-      default:
-        context.go('/login');
-    }
+    // Replace splash so the user can't go back to it
+    context.go(route);
   }
 
   @override
   Widget build(BuildContext context) {
     return const Scaffold(
-      body: Center(child: CircularProgressIndicator()),
+      backgroundColor: Color(0xFFF4F6FB),
+      body: Center(
+        child: CircularProgressIndicator(color: Color(0xFF3B5BDB)),
+      ),
     );
   }
 }

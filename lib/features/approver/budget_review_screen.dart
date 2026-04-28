@@ -1,220 +1,3 @@
-// import 'package:flutter/material.dart';
-// import 'package:flutter_riverpod/flutter_riverpod.dart';
-// import 'package:url_launcher/url_launcher.dart';
-
-// import '../../models/budget_model.dart';
-// import '../../providers/auth_provider.dart';
-
-// class BudgetReviewScreen extends ConsumerStatefulWidget {
-//   final BudgetModel budget;
-
-//   const BudgetReviewScreen({
-//     super.key,
-//     required this.budget,
-//   });
-
-//   @override
-//   ConsumerState<BudgetReviewScreen> createState() => _BudgetReviewScreenState();
-// }
-
-// class _BudgetReviewScreenState extends ConsumerState<BudgetReviewScreen> {
-//   final _remarksController = TextEditingController();
-//   bool _loading = false;
-
-//   Future<void> _openFile() async {
-//     final storagePath = widget.budget.storagePath;
-//     if (storagePath == null || storagePath.isEmpty) {
-//       if (!mounted) return;
-//       ScaffoldMessenger.of(context).showSnackBar(
-//         const SnackBar(content: Text('No file available to view.')),
-//       );
-//       return;
-//     }
-
-//     try {
-//       final url = await ref
-//           .read(storageServiceProvider)
-//           .getSignedFileUrl(storagePath);
-
-//       final uri = Uri.parse(url);
-//       final launched = await launchUrl(uri, mode: LaunchMode.externalApplication);
-
-//       if (!launched && mounted) {
-//         ScaffoldMessenger.of(context).showSnackBar(
-//           const SnackBar(content: Text('Could not open file.')),
-//         );
-//       }
-//     } catch (e) {
-//       if (!mounted) return;
-//       ScaffoldMessenger.of(context).showSnackBar(
-//         SnackBar(content: Text('Error opening file: $e')),
-//       );
-//     }
-//   }
-
-//   Future<void> _approve() async {
-//     setState(() => _loading = true);
-//     try {
-//       await ref.read(eventServiceProvider).approveBudget(
-//             budgetId: widget.budget.id,
-//             eventId: widget.budget.eventId,
-//             remarks: _remarksController.text.trim(),
-//           );
-//       if (!mounted) return;
-//       Navigator.pop(context, true);
-//     } catch (e) {
-//       if (!mounted) return;
-//       ScaffoldMessenger.of(context).showSnackBar(
-//         SnackBar(content: Text(e.toString())),
-//       );
-//     } finally {
-//       if (mounted) setState(() => _loading = false);
-//     }
-//   }
-
-//   Future<void> _requestChanges() async {
-//     setState(() => _loading = true);
-//     try {
-//       await ref.read(eventServiceProvider).requestBudgetChanges(
-//             budgetId: widget.budget.id,
-//             eventId: widget.budget.eventId,
-//             remarks: _remarksController.text.trim(),
-//           );
-//       if (!mounted) return;
-//       Navigator.pop(context, true);
-//     } catch (e) {
-//       if (!mounted) return;
-//       ScaffoldMessenger.of(context).showSnackBar(
-//         SnackBar(content: Text(e.toString())),
-//       );
-//     } finally {
-//       if (mounted) setState(() => _loading = false);
-//     }
-//   }
-
-//   Future<void> _reject() async {
-//     setState(() => _loading = true);
-//     try {
-//       await ref.read(eventServiceProvider).rejectBudget(
-//             budgetId: widget.budget.id,
-//             eventId: widget.budget.eventId,
-//             remarks: _remarksController.text.trim(),
-//           );
-//       if (!mounted) return;
-//       Navigator.pop(context, true);
-//     } catch (e) {
-//       if (!mounted) return;
-//       ScaffoldMessenger.of(context).showSnackBar(
-//         SnackBar(content: Text(e.toString())),
-//       );
-//     } finally {
-//       if (mounted) setState(() => _loading = false);
-//     }
-//   }
-
-//   @override
-//   void dispose() {
-//     _remarksController.dispose();
-//     super.dispose();
-//   }
-
-//   @override
-//   Widget build(BuildContext context) {
-//     final budget = widget.budget;
-
-//     return Scaffold(
-//       appBar: AppBar(title: const Text('Budget Review')),
-//       body: Padding(
-//         padding: const EdgeInsets.all(16),
-//         child: Column(
-//           children: [
-//             Align(
-//               alignment: Alignment.centerLeft,
-//               child: Text(
-//                 'Total Requested: ₹${budget.totalRequested}',
-//                 style: const TextStyle(
-//                   fontSize: 18,
-//                   fontWeight: FontWeight.bold,
-//                 ),
-//               ),
-//             ),
-//             const SizedBox(height: 12),
-//             Align(
-//               alignment: Alignment.centerLeft,
-//               child: Text('Status: ${budget.status}'),
-//             ),
-//             const SizedBox(height: 12),
-//             Align(
-//               alignment: Alignment.centerLeft,
-//               child: Text('Note: ${budget.summaryNote ?? '-'}'),
-//             ),
-//             const SizedBox(height: 12),
-//             Align(
-//               alignment: Alignment.centerLeft,
-//               child: Text(
-//                 'Approval Number: ${budget.approvalNumber ?? 'Not generated yet'}',
-//               ),
-//             ),
-//             const SizedBox(height: 12),
-//             Align(
-//               alignment: Alignment.centerLeft,
-//               child: budget.fileName != null
-//                   ? Row(
-//                       children: [
-//                         Expanded(
-//                           child: Text('File: ${budget.fileName}'),
-//                         ),
-//                         TextButton(
-//                           onPressed: _openFile,
-//                           child: const Text('View File'),
-//                         ),
-//                       ],
-//                     )
-//                   : const Text('File: No file uploaded'),
-//             ),
-//             const SizedBox(height: 20),
-//             if (budget.status == 'pending')
-//               TextField(
-//                 controller: _remarksController,
-//                 maxLines: 3,
-//                 decoration: const InputDecoration(
-//                   labelText: 'Remarks',
-//                   border: OutlineInputBorder(),
-//                 ),
-//               ),
-//             const SizedBox(height: 20),
-//             if (budget.status == 'pending') ...[
-//               SizedBox(
-//                 width: double.infinity,
-//                 child: ElevatedButton(
-//                   onPressed: _loading ? null : _approve,
-//                   child: const Text('Approve Budget'),
-//                 ),
-//               ),
-//               const SizedBox(height: 10),
-//               SizedBox(
-//                 width: double.infinity,
-//                 child: ElevatedButton(
-//                   onPressed: _loading ? null : _requestChanges,
-//                   child: const Text('Request Budget Changes'),
-//                 ),
-//               ),
-//               const SizedBox(height: 10),
-//               SizedBox(
-//                 width: double.infinity,
-//                 child: ElevatedButton(
-//                   onPressed: _loading ? null : _reject,
-//                   child: const Text('Reject Budget'),
-//                 ),
-//               ),
-//             ],
-//           ],
-//         ),
-//       ),
-//     );
-//   }
-// }
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -222,7 +5,6 @@ import 'package:url_launcher/url_launcher.dart';
 import '../../models/budget_model.dart';
 import '../../providers/auth_provider.dart';
 
-// ── Design tokens ─────────────────────────────────────────────────────────────
 const _kPrimary    = Color(0xFF3B5BDB);
 const _kPrimaryBg  = Color(0xFFEEF2FF);
 const _kSurface    = Colors.white;
@@ -237,7 +19,6 @@ const _kRed        = Color(0xFFDC2626);
 const _kRedBg      = Color(0xFFFEF2F2);
 const _kAmber      = Color(0xFFD97706);
 const _kAmberBg    = Color(0xFFFFFBEB);
-// ─────────────────────────────────────────────────────────────────────────────
 
 class BudgetReviewScreen extends ConsumerStatefulWidget {
   final BudgetModel budget;
@@ -351,22 +132,26 @@ class _BudgetReviewScreenState extends ConsumerState<BudgetReviewScreen> {
     return Scaffold(
       backgroundColor: _kBackground,
       appBar: AppBar(
-        backgroundColor: _kSurface,
+        backgroundColor: Colors.transparent,
         elevation: 0,
-        surfaceTintColor: Colors.transparent,
+        flexibleSpace: Container(
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(
+              colors: [Color(0xFF3D52A0), Color(0xFF7091E6)],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+          ),
+        ),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios_new,
-              size: 18, color: _kTextDark),
+              size: 18, color: Colors.white),
           onPressed: () => Navigator.pop(context),
         ),
         title: const Text(
           'Budget Review',
           style: TextStyle(
-              fontSize: 17, fontWeight: FontWeight.w700, color: _kTextDark),
-        ),
-        bottom: PreferredSize(
-          preferredSize: const Size.fromHeight(1),
-          child: Divider(height: 1, color: Colors.grey.shade200),
+              fontSize: 17, fontWeight: FontWeight.w700, color: Colors.white),
         ),
       ),
       body: SingleChildScrollView(

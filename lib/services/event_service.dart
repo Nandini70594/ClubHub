@@ -53,7 +53,7 @@ class EventService {
 
     final data = await _client
         .from('events')
-        .select()
+        .select('*, clubs(*)')
         .eq('proposal_approved_by', authUser.id)
         .inFilter('proposal_status', ['approved', 'changes_requested', 'rejected'])
         .order('proposal_approved_at', ascending: false);
@@ -90,7 +90,15 @@ class EventService {
   Future<List<BudgetModel>> getPendingBudgets() async {
     final data = await _client
         .from('budget')
-        .select()
+        .select('''
+          *,
+          events!inner(
+            club_id,
+            clubs!inner(
+              name
+            )
+          )
+        ''')
         .eq('status', 'pending')
         .order('created_at', ascending: false);
 
@@ -105,7 +113,15 @@ class EventService {
 
     final data = await _client
         .from('budget')
-        .select()
+        .select('''
+          *,
+          events!inner(
+            club_id,
+            clubs!inner(
+              name
+            )
+          )
+        ''')
         .eq('approved_by', authUser.id)
         .inFilter('status', ['approved', 'changes_requested', 'rejected'])
         .order('approved_at', ascending: false);
@@ -674,32 +690,32 @@ class EventService {
   }
 
   Future<List<EventModel>> getArchivedEventsForRole(String role) async {
-  final authUser = _client.auth.currentUser;
-  if (authUser == null) return [];
+    final authUser = _client.auth.currentUser;
+    if (authUser == null) return [];
 
-  final user = await _client
-      .from('users')
-      .select('club_id')
-      .eq('id', authUser.id)
-      .single();
+    var query = _client
+        .from('events')
+        .select('*, clubs(*)')
+        .eq('status', 'closed');
 
-  final clubId = user['club_id'];
+    // Club based filtering - only for club_lead and proposal_approver
+    if (role == 'club_lead' || role == 'proposal_approver') {
+      final user = await _client
+          .from('users')
+          .select('club_id')
+          .eq('id', authUser.id)
+          .single();
 
-  var query = _client
-      .from('events')
-      .select('*, clubs(*)')
-      .eq('status', 'closed');
+      final clubId = user['club_id'];
+      if (clubId == null) return []; // safety
+      query = query.eq('club_id', clubId);
+    }
+    // For vertical_coordinator, admin, and other roles, show all clubs
 
-  // Club based filtering
-  if (role == 'club_lead' || role == 'proposal_approver') {
-    if (clubId == null) return []; // safety
-    query = query.eq('club_id', clubId);
+    final data = await query.order('created_at', ascending: false);
+
+    return (data as List)
+        .map((e) => EventModel.fromMap(e as Map<String, dynamic>))
+        .toList();
   }
-
-  final data = await query.order('created_at', ascending: false);
-
-  return (data as List)
-      .map((e) => EventModel.fromMap(e as Map<String, dynamic>))
-      .toList();
-}
 }

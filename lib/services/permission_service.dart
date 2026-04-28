@@ -28,7 +28,16 @@ class PermissionService {
   ) async {
     final data = await _client
         .from('permission_requests')
-        .select()
+        .select('''
+  *,
+  events (
+    title,
+    club_id,
+    clubs (
+      name
+    )
+  )
+''')
         .eq('event_id', eventId)
         .order('requested_at', ascending: false)
         .limit(1)
@@ -41,7 +50,16 @@ class PermissionService {
   Future<PermissionRequestModel?> getRequestById(String requestId) async {
     final data = await _client
         .from('permission_requests')
-        .select()
+        .select('''
+  *,
+  events (
+    title,
+    club_id,
+    clubs (
+      name
+    )
+  )
+''')
         .eq('id', requestId)
         .maybeSingle();
 
@@ -85,7 +103,16 @@ class PermissionService {
           'requested_by': userId,
           'is_resubmission': false,
         })
-        .select()
+        .select('''
+  *,
+  events (
+    title,
+    club_id,
+    clubs (
+      name
+    )
+  )
+''')
         .single();
 
     final requestId = inserted['id'] as String;
@@ -126,7 +153,16 @@ class PermissionService {
           'parent_request_id': oldRequestId,
           'is_resubmission': true,
         })
-        .select()
+        .select('''
+  *,
+  events (
+    title,
+    club_id,
+    clubs (
+      name
+    )
+  )
+''')
         .single();
 
     final requestId = inserted['id'] as String;
@@ -152,7 +188,16 @@ class PermissionService {
   ) async {
     final data = await _client
         .from('permission_requests')
-        .select()
+        .select('''
+  *,
+  events (
+    title,
+    club_id,
+    clubs (
+      name
+    )
+  )
+''')
         .eq('status', 'PENDING')
         .eq('current_approver_role', role)
         .order('requested_at', ascending: false);
@@ -184,7 +229,16 @@ class PermissionService {
 
   final data = await _client
       .from('permission_requests')
-      .select()
+      .select('''
+  *,
+  events (
+    title,
+    club_id,
+    clubs (
+      name
+    )
+  )
+''')
       .inFilter('id', requestIds);
 
   final requests = (data as List)

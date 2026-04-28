@@ -1,229 +1,3 @@
-// import 'package:flutter/material.dart';
-// import 'package:flutter_riverpod/flutter_riverpod.dart';
-
-// import '../../models/activity_log_model.dart';
-// import '../../models/event_model.dart';
-// import '../../models/stage_model.dart';
-// import '../../providers/auth_provider.dart';
-
-// class ProposalReviewScreen extends ConsumerStatefulWidget {
-//   final String eventId;
-
-//   const ProposalReviewScreen({
-//     super.key,
-//     required this.eventId,
-//   });
-
-//   @override
-//   ConsumerState<ProposalReviewScreen> createState() =>
-//       _ProposalReviewScreenState();
-// }
-
-// class _ProposalReviewScreenState extends ConsumerState<ProposalReviewScreen> {
-//   final _remarksController = TextEditingController();
-//   bool _loading = false;
-
-//   Future<void> _approve() async {
-//     setState(() => _loading = true);
-//     try {
-//       await ref.read(eventServiceProvider).approveProposal(
-//             eventId: widget.eventId,
-//             remarks: _remarksController.text.trim(),
-//           );
-//       if (!mounted) return;
-//       Navigator.pop(context, true);
-//     } catch (e) {
-//       if (!mounted) return;
-//       ScaffoldMessenger.of(context).showSnackBar(
-//         SnackBar(content: Text(e.toString())),
-//       );
-//     } finally {
-//       if (mounted) setState(() => _loading = false);
-//     }
-//   }
-
-//   Future<void> _requestChanges() async {
-//     setState(() => _loading = true);
-//     try {
-//       await ref.read(eventServiceProvider).requestProposalChanges(
-//             eventId: widget.eventId,
-//             remarks: _remarksController.text.trim(),
-//           );
-//       if (!mounted) return;
-//       Navigator.pop(context, true);
-//     } catch (e) {
-//       if (!mounted) return;
-//       ScaffoldMessenger.of(context).showSnackBar(
-//         SnackBar(content: Text(e.toString())),
-//       );
-//     } finally {
-//       if (mounted) setState(() => _loading = false);
-//     }
-//   }
-
-//   Future<void> _reject() async {
-//     setState(() => _loading = true);
-//     try {
-//       await ref.read(eventServiceProvider).rejectProposal(
-//             eventId: widget.eventId,
-//             remarks: _remarksController.text.trim(),
-//           );
-//       if (!mounted) return;
-//       Navigator.pop(context, true);
-//     } catch (e) {
-//       if (!mounted) return;
-//       ScaffoldMessenger.of(context).showSnackBar(
-//         SnackBar(content: Text(e.toString())),
-//       );
-//     } finally {
-//       if (mounted) setState(() => _loading = false);
-//     }
-//   }
-
-//   String _formatDateTime(String? dateTimeStr) {
-//     if (dateTimeStr == null || dateTimeStr.isEmpty) return '';
-//     final dt = DateTime.parse(dateTimeStr).toLocal();
-//     final hour = dt.hour % 12 == 0 ? 12 : dt.hour % 12;
-//     final minute = dt.minute.toString().padLeft(2, '0');
-//     final amPm = dt.hour >= 12 ? 'PM' : 'AM';
-//     return '${dt.day}/${dt.month}/${dt.year} • $hour:$minute $amPm';
-//   }
-
-//   @override
-//   void dispose() {
-//     _remarksController.dispose();
-//     super.dispose();
-//   }
-
-//   @override
-//   Widget build(BuildContext context) {
-//     final eventService = ref.read(eventServiceProvider);
-
-//     return Scaffold(
-//       appBar: AppBar(title: const Text('Proposal Review')),
-//       body: FutureBuilder<List<dynamic>>(
-//         future: Future.wait<dynamic>([
-//           eventService.getEventById(widget.eventId),
-//           eventService.getStagesForEvent(widget.eventId),
-//           eventService.getActivityLogsForEvent(widget.eventId),
-//         ]),
-//         builder: (context, snapshot) {
-//           if (snapshot.connectionState == ConnectionState.waiting) {
-//             return const Center(child: CircularProgressIndicator());
-//           }
-
-//           if (snapshot.hasError) {
-//             return Center(child: Text('Error: ${snapshot.error}'));
-//           }
-
-//           if (!snapshot.hasData) {
-//             return const Center(child: Text('No data found'));
-//           }
-
-//           final data = snapshot.data!;
-//           final event = data[0] as EventModel;
-//           final stages = data[1] as List<StageModel>;
-//           final logs = data[2] as List<ActivityLogModel>;
-
-//           return SingleChildScrollView(
-//             padding: const EdgeInsets.all(16),
-//             child: Column(
-//               crossAxisAlignment: CrossAxisAlignment.start,
-//               children: [
-//                 Text(
-//                   event.title,
-//                   style: const TextStyle(
-//                     fontSize: 22,
-//                     fontWeight: FontWeight.bold,
-//                   ),
-//                 ),
-//                 const SizedBox(height: 8),
-//                 Text('Proposal Status: ${event.proposalStatus}'),
-//                 Text('Date: ${event.eventDate}'),
-//                 Text('Venue: ${event.venue ?? '-'}'),
-//                 const SizedBox(height: 8),
-//                 Text('Description: ${event.description ?? '-'}'),
-//                 const SizedBox(height: 24),
-//                 const Text(
-//                   'Stage Tracker',
-//                   style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-//                 ),
-//                 const SizedBox(height: 12),
-//                 ...stages.map((stage) {
-//                   return Card(
-//                     child: ListTile(
-//                       leading: CircleAvatar(
-//                         child: Text(stage.stageNumber.toString()),
-//                       ),
-//                       title: Text(stage.stageName),
-//                       subtitle: Text('Status: ${stage.status}'),
-//                     ),
-//                   );
-//                 }),
-//                 const SizedBox(height: 24),
-//                 TextField(
-//                   controller: _remarksController,
-//                   maxLines: 3,
-//                   decoration: const InputDecoration(
-//                     labelText: 'Remarks',
-//                     border: OutlineInputBorder(),
-//                   ),
-//                 ),
-//                 const SizedBox(height: 16),
-//                 if (event.proposalStatus == 'pending')
-//                   Column(
-//                     children: [
-//                       SizedBox(
-//                         width: double.infinity,
-//                         child: ElevatedButton(
-//                           onPressed: _loading ? null : _approve,
-//                           child: const Text('Approve Proposal'),
-//                         ),
-//                       ),
-//                       const SizedBox(height: 10),
-//                       SizedBox(
-//                         width: double.infinity,
-//                         child: ElevatedButton(
-//                           onPressed: _loading ? null : _requestChanges,
-//                           child: const Text('Request Changes'),
-//                         ),
-//                       ),
-//                       const SizedBox(height: 10),
-//                       SizedBox(
-//                         width: double.infinity,
-//                         child: ElevatedButton(
-//                           onPressed: _loading ? null : _reject,
-//                           child: const Text('Reject Proposal'),
-//                         ),
-//                       ),
-//                     ],
-//                   ),
-//                 const SizedBox(height: 24),
-//                 const Text(
-//                   'Activity Log',
-//                   style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-//                 ),
-//                 const SizedBox(height: 12),
-//                 if (logs.isEmpty)
-//                   const Text('No activity yet')
-//                 else
-//                   ...logs.map((log) {
-//                     return Card(
-//                       child: ListTile(
-//                         title: Text(log.action),
-//                         subtitle: Text(_formatDateTime(log.createdAt)),
-//                       ),
-//                     );
-//                   }),
-//               ],
-//             ),
-//           );
-//         },
-//       ),
-//     );
-//   }
-// }
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -231,6 +5,7 @@ import '../../models/activity_log_model.dart';
 import '../../models/event_model.dart';
 import '../../models/stage_model.dart';
 import '../../providers/auth_provider.dart';
+import '../../widgets/app_scaffold.dart';
 
 // ── ERPTheme tokens (same as other screens) ────────────────────────────────
 class ERPTheme {
@@ -268,7 +43,6 @@ class ERPTheme {
     end: Alignment.bottomRight,
   );
 }
-// ────────────────────────────────────────────────────────────────────────────
 
 class ProposalReviewScreen extends ConsumerStatefulWidget {
   final String eventId;
@@ -474,7 +248,11 @@ class _ProposalReviewScreenState extends ConsumerState<ProposalReviewScreen> {
   Widget build(BuildContext context) {
     final eventService = ref.read(eventServiceProvider);
 
-    return Scaffold(
+    return AppScaffold(
+  title: 'ClubHub',
+  currentRoute: '/proposal-approver',
+  showBottomNav: false,
+  child: Scaffold(
       backgroundColor: ERPTheme.bgPage,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
@@ -508,7 +286,6 @@ class _ProposalReviewScreenState extends ConsumerState<ProposalReviewScreen> {
           if (snapshot.hasError) {
             return Center(child: Text('Error: ${snapshot.error}'));
           }
-
           if (!snapshot.hasData) {
             return const Center(child: Text('No data found'));
           }
@@ -517,6 +294,11 @@ class _ProposalReviewScreenState extends ConsumerState<ProposalReviewScreen> {
           final event = data[0] as EventModel;
           final stages = data[1] as List<StageModel>;
           final logs = data[2] as List<ActivityLogModel>;
+
+          // Get current user role
+          final currentUser = ref.read(currentUserProfileProvider).value;
+          final isAdmin = currentUser?.role == 'admin';
+          final isVerticalCoordinator = currentUser?.role == 'vertical_coordinator';
 
           return SingleChildScrollView(
             padding: const EdgeInsets.all(16),
@@ -574,120 +356,122 @@ class _ProposalReviewScreenState extends ConsumerState<ProposalReviewScreen> {
 
                 const SizedBox(height: 20),
 
-                // ── Stage Tracker ────────────────────────────────────────
-                _sectionTitle('Stage Tracker'),
+                // ── Stage Tracker (hidden for vertical coordinator) ────────
+                if (!isVerticalCoordinator) ...[
+                  _sectionTitle('Stage Tracker'),
 
-                Container(
-                  decoration: ERPTheme.cardDecoration,
-                  child: stages.isEmpty
-                      ? const Padding(
-                          padding: EdgeInsets.all(16),
-                          child: Text(
-                            'No stages found',
-                            style: TextStyle(color: ERPTheme.textSecondary),
-                          ),
-                        )
-                      : Column(
-                          children: List.generate(stages.length, (index) {
-                            final stage = stages[index];
-                            final isLast = index == stages.length - 1;
-                            final stageColor = _stageColor(stage.status);
-                            return IntrinsicHeight(
-                              child: Row(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  // Timeline column
-                                  SizedBox(
-                                    width: 56,
-                                    child: Column(
-                                      children: [
-                                        const SizedBox(height: 16),
-                                        Container(
-                                          width: 32,
-                                          height: 32,
-                                          decoration: BoxDecoration(
-                                            color: stageColor.withOpacity(0.15),
-                                            shape: BoxShape.circle,
-                                            border: Border.all(
-                                                color: stageColor, width: 2),
-                                          ),
-                                          child: Center(
-                                            child: Text(
-                                              '${stage.stageNumber}',
-                                              style: TextStyle(
-                                                color: stageColor,
-                                                fontWeight: FontWeight.w700,
-                                                fontSize: 13,
-                                              ),
-                                            ),
-                                          ),
-                                        ),
-                                        if (!isLast)
-                                          Expanded(
-                                            child: Container(
-                                              width: 2,
-                                              color: ERPTheme.divider,
-                                              margin: const EdgeInsets.only(
-                                                  top: 4),
-                                            ),
-                                          ),
-                                        if (isLast) const SizedBox(height: 16),
-                                      ],
-                                    ),
-                                  ),
-                                  // Content
-                                  Expanded(
-                                    child: Padding(
-                                      padding: EdgeInsets.only(
-                                        top: 12,
-                                        bottom: isLast ? 16 : 12,
-                                        right: 16,
-                                      ),
+                  Container(
+                    decoration: ERPTheme.cardDecoration,
+                    child: stages.isEmpty
+                        ? const Padding(
+                            padding: EdgeInsets.all(16),
+                            child: Text(
+                              'No stages found',
+                              style: TextStyle(color: ERPTheme.textSecondary),
+                            ),
+                          )
+                        : Column(
+                            children: List.generate(stages.length, (index) {
+                              final stage = stages[index];
+                              final isLast = index == stages.length - 1;
+                              final stageColor = _stageColor(stage.status);
+                              return IntrinsicHeight(
+                                child: Row(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    // Timeline column
+                                    SizedBox(
+                                      width: 56,
                                       child: Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
                                         children: [
-                                          Text(
-                                            stage.stageName,
-                                            style: const TextStyle(
-                                              color: ERPTheme.textPrimary,
-                                              fontWeight: FontWeight.w600,
-                                              fontSize: 14,
-                                            ),
-                                          ),
-                                          const SizedBox(height: 4),
+                                          const SizedBox(height: 16),
                                           Container(
-                                            padding:
-                                                const EdgeInsets.symmetric(
-                                                    horizontal: 8,
-                                                    vertical: 3),
+                                            width: 32,
+                                            height: 32,
                                             decoration: BoxDecoration(
-                                              color: stageColor
-                                                  .withOpacity(0.10),
-                                              borderRadius:
-                                                  BorderRadius.circular(12),
+                                              color: stageColor.withOpacity(0.15),
+                                              shape: BoxShape.circle,
+                                              border: Border.all(
+                                                  color: stageColor, width: 2),
                                             ),
-                                            child: Text(
-                                              stage.status,
-                                              style: TextStyle(
-                                                color: stageColor,
-                                                fontSize: 11,
-                                                fontWeight: FontWeight.w600,
+                                            child: Center(
+                                              child: Text(
+                                                '${stage.stageNumber}',
+                                                style: TextStyle(
+                                                  color: stageColor,
+                                                  fontWeight: FontWeight.w700,
+                                                  fontSize: 13,
+                                                ),
                                               ),
                                             ),
                                           ),
+                                          if (!isLast)
+                                            Expanded(
+                                              child: Container(
+                                                width: 2,
+                                                color: ERPTheme.divider,
+                                                margin: const EdgeInsets.only(
+                                                    top: 4),
+                                              ),
+                                            ),
+                                          if (isLast) const SizedBox(height: 16),
                                         ],
                                       ),
                                     ),
-                                  ),
-                                ],
-                              ),
-                            );
-                          }),
-                        ),
-                ),
+                                    // Content
+                                    Expanded(
+                                      child: Padding(
+                                        padding: EdgeInsets.only(
+                                          top: 12,
+                                          bottom: isLast ? 16 : 12,
+                                          right: 16,
+                                        ),
+                                        child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Text(
+                                              stage.stageName,
+                                              style: const TextStyle(
+                                                color: ERPTheme.textPrimary,
+                                                fontWeight: FontWeight.w600,
+                                                fontSize: 14,
+                                              ),
+                                            ),
+                                            const SizedBox(height: 4),
+                                            Container(
+                                              padding:
+                                                  const EdgeInsets.symmetric(
+                                                      horizontal: 8,
+                                                      vertical: 3),
+                                              decoration: BoxDecoration(
+                                                color: stageColor
+                                                    .withOpacity(0.10),
+                                                borderRadius:
+                                                    BorderRadius.circular(12),
+                                              ),
+                                              child: Text(
+                                                stage.status,
+                                                style: TextStyle(
+                                                  color: stageColor,
+                                                  fontSize: 11,
+                                                  fontWeight: FontWeight.w600,
+                                                ),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              );
+                            }),
+                          ),
+                  ),
 
-                const SizedBox(height: 20),
+                  const SizedBox(height: 20),
+                ],
 
                 // ── Remarks Field ────────────────────────────────────────
                 if (event.proposalStatus == 'pending') ...[
@@ -798,89 +582,91 @@ class _ProposalReviewScreenState extends ConsumerState<ProposalReviewScreen> {
                   const SizedBox(height: 24),
                 ],
 
-                // ── Activity Log ─────────────────────────────────────────
-                _sectionTitle('Activity Log'),
+                // ── Activity Log (Admin only) ───────────────────────────────────────
+                if (isAdmin) ...[
+                  _sectionTitle('Activity Log'),
 
-                logs.isEmpty
-                    ? Container(
-                        width: double.infinity,
-                        padding: const EdgeInsets.all(20),
-                        decoration: ERPTheme.cardDecoration,
-                        child: const Center(
-                          child: Text(
-                            'No activity yet',
-                            style:
-                                TextStyle(color: ERPTheme.textSecondary),
+                  logs.isEmpty
+                      ? Container(
+                          width: double.infinity,
+                          padding: const EdgeInsets.all(20),
+                          decoration: ERPTheme.cardDecoration,
+                          child: const Center(
+                            child: Text(
+                              'No activity yet',
+                              style:
+                                  TextStyle(color: ERPTheme.textSecondary),
+                            ),
+                          ),
+                        )
+                      : Container(
+                          decoration: ERPTheme.cardDecoration,
+                          child: Column(
+                            children: List.generate(logs.length, (index) {
+                              final log = logs[index];
+                              final isLast = index == logs.length - 1;
+                              return Column(
+                                children: [
+                                  Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 16, vertical: 12),
+                                    child: Row(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.center,
+                                      children: [
+                                        Container(
+                                          width: 36,
+                                          height: 36,
+                                          decoration: BoxDecoration(
+                                            color: ERPTheme.primarySurface,
+                                            shape: BoxShape.circle,
+                                          ),
+                                          child: const Icon(
+                                            Icons.history_rounded,
+                                            color: ERPTheme.primary,
+                                            size: 18,
+                                          ),
+                                        ),
+                                        const SizedBox(width: 12),
+                                        Expanded(
+                                          child: Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              Text(
+                                                log.action,
+                                                style: const TextStyle(
+                                                  color: ERPTheme.textPrimary,
+                                                  fontWeight: FontWeight.w600,
+                                                  fontSize: 13,
+                                                ),
+                                              ),
+                                              const SizedBox(height: 2),
+                                              Text(
+                                                _formatDateTime(log.createdAt),
+                                                style: const TextStyle(
+                                                  color:
+                                                      ERPTheme.textSecondary,
+                                                  fontSize: 12,
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  if (!isLast)
+                                    const Divider(
+                                        color: ERPTheme.divider,
+                                        height: 1,
+                                        indent: 64),
+                                ],
+                              );
+                            }),
                           ),
                         ),
-                      )
-                    : Container(
-                        decoration: ERPTheme.cardDecoration,
-                        child: Column(
-                          children: List.generate(logs.length, (index) {
-                            final log = logs[index];
-                            final isLast = index == logs.length - 1;
-                            return Column(
-                              children: [
-                                Padding(
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 16, vertical: 12),
-                                  child: Row(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.center,
-                                    children: [
-                                      Container(
-                                        width: 36,
-                                        height: 36,
-                                        decoration: BoxDecoration(
-                                          color: ERPTheme.primarySurface,
-                                          shape: BoxShape.circle,
-                                        ),
-                                        child: const Icon(
-                                          Icons.history_rounded,
-                                          color: ERPTheme.primary,
-                                          size: 18,
-                                        ),
-                                      ),
-                                      const SizedBox(width: 12),
-                                      Expanded(
-                                        child: Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: [
-                                            Text(
-                                              log.action,
-                                              style: const TextStyle(
-                                                color: ERPTheme.textPrimary,
-                                                fontWeight: FontWeight.w600,
-                                                fontSize: 13,
-                                              ),
-                                            ),
-                                            const SizedBox(height: 2),
-                                            Text(
-                                              _formatDateTime(log.createdAt),
-                                              style: const TextStyle(
-                                                color:
-                                                    ERPTheme.textSecondary,
-                                                fontSize: 12,
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                                if (!isLast)
-                                  const Divider(
-                                      color: ERPTheme.divider,
-                                      height: 1,
-                                      indent: 64),
-                              ],
-                            );
-                          }),
-                        ),
-                      ),
+                ],
 
                 const SizedBox(height: 24),
               ],
@@ -888,6 +674,7 @@ class _ProposalReviewScreenState extends ConsumerState<ProposalReviewScreen> {
           );
         },
       ),
+  ),
     );
   }
 }
