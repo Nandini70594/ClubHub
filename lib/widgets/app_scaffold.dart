@@ -88,6 +88,12 @@ class AppScaffold extends ConsumerWidget {
       elevation: 0,
       surfaceTintColor: Colors.transparent,
       automaticallyImplyLeading: false,
+      leading: Navigator.canPop(context)
+      ? IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () => Navigator.pop(context),
+        )
+      : null,
       title: Row(
         children: [
           Container(
@@ -177,9 +183,7 @@ class AppScaffold extends ConsumerWidget {
               return Expanded(
                 child: InkWell(
                   onTap: () {
-                    if (!isActive) {
-                      context.go(tab.route);
-                    }
+                      context.go(tab.route);                    
                   },
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
@@ -238,7 +242,7 @@ class AppScaffold extends ConsumerWidget {
           'Sign out?',
           style: TextStyle(fontSize: 17, fontWeight: FontWeight.w700),
         ),
-        content: const Text('You will be returned to the login screen.'),
+        content: const Text('Are you sure?.'),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),

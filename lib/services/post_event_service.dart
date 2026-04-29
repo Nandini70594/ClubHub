@@ -36,55 +36,59 @@ class PostEventService {
   }
 
   Future<void> submitExpense({
-    required String eventId,
-    required double actualAmount,
-    required String summaryNote,
-    required List<Map<String, dynamic>> files,
-  }) async {
-    final userId = _currentUserId;
-    if (userId == null) throw Exception('User not logged in');
+  required String eventId,
+  required double actualAmount,
+  required String summaryNote,
+  required List<Map<String, dynamic>> files,
+}) async {
+  final userId = _currentUserId;
+  if (userId == null) throw Exception('User not logged in');
 
-    final inserted = await _client
-        .from('event_expenses')
-        .insert({
-          'event_id': eventId,
-          'actual_amount': actualAmount,
-          'summary_note': summaryNote,
-          'status': 'pending',
-          'submitted_by': userId,
-        })
-        .select()
-        .single();
+  final inserted = await _client
+      .from('event_expenses')
+      .insert({
+        'event_id': eventId,
+        'actual_amount': actualAmount,
+        'summary_note': summaryNote,
+        'status': 'pending',
+        'submitted_by': userId,
+      })
+      .select()
+      .maybeSingle();
 
-    final expenseId = inserted['id'] as String;
-
-    final payload = files.map((file) {
-      return {
-        'expense_id': expenseId,
-        'file_type': file['file_type'],
-        'file_name': file['file_name'],
-        'storage_path': file['storage_path'],
-      };
-    }).toList();
-
-    if (payload.isNotEmpty) {
-      await _client.from('event_expense_files').insert(payload);
-    }
-
-    await _client
-        .from('stages')
-        .update({'status': 'pending'})
-        .eq('event_id', eventId)
-        .eq('stage_number', 5);
-
-    await _client
-        .from('events')
-        .update({
-          'current_stage': 5,
-          'progress_pct': 75,
-        })
-        .eq('id', eventId);
+  if (inserted == null) {
+    throw Exception('Expense submission failed.');
   }
+
+  final expenseId = inserted['id'] as String;
+
+  final payload = files.map((file) {
+    return {
+      'expense_id': expenseId,
+      'file_type': file['file_type'],
+      'file_name': file['file_name'],
+      'storage_path': file['storage_path'],
+    };
+  }).toList();
+
+  if (payload.isNotEmpty) {
+    await _client.from('event_expense_files').insert(payload);
+  }
+
+  await _client
+      .from('stages')
+      .update({'status': 'pending'})
+      .eq('event_id', eventId)
+      .eq('stage_number', 5);
+
+  await _client
+      .from('events')
+      .update({
+        'current_stage': 5,
+        'progress_pct': 75,
+      })
+      .eq('id', eventId);
+}
 
   Future<List<EventExpenseModel>> getPendingExpenses() async {
     final data = await _client
@@ -239,29 +243,33 @@ class PostEventService {
   }
 
   Future<void> submitClosingReport({
-    required String eventId,
-    required String approvalNumber,
-    required bool googleFormSubmitted,
-    required bool vendorAuthorized,
-    required String summary,
-    required List<Map<String, dynamic>> files,
-  }) async {
-    final userId = _currentUserId;
-    if (userId == null) throw Exception('User not logged in');
+  required String eventId,
+  required String approvalNumber,
+  required bool googleFormSubmitted,
+  required bool vendorAuthorized,
+  required String summary,
+  required List<Map<String, dynamic>> files,
+}) async {
+  final userId = _currentUserId;
+  if (userId == null) throw Exception('User not logged in');
 
-    final inserted = await _client
-        .from('event_closing_reports')
-        .insert({
-          'event_id': eventId,
-          'approval_number': approvalNumber,
-          'google_form_submitted': googleFormSubmitted,
-          'vendor_authorized': vendorAuthorized,
-          'summary': summary,
-          'status': 'closed',
-          'submitted_by': userId,
-        })
-        .select()
-        .single();
+  final inserted = await _client
+      .from('event_closing_reports')
+      .insert({
+        'event_id': eventId,
+        'approval_number': approvalNumber,
+        'google_form_submitted': googleFormSubmitted,
+        'vendor_authorized': vendorAuthorized,
+        'summary': summary,
+        'status': 'closed',
+        'submitted_by': userId, 
+      })
+      .select()
+      .maybeSingle();
+
+  if (inserted == null) {
+    throw Exception('Closing report submission failed.');
+  }
 
     final closingReportId = inserted['id'] as String;
 

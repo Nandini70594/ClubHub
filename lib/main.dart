@@ -8,6 +8,9 @@ import 'core/router/app_router.dart';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
+debugPrint("SUPABASE URL = ${Env.supabaseUrl}");
+  debugPrint("SUPABASE KEY LENGTH = ${Env.supabaseAnonKey.length}");
+  
   await Supabase.initialize(
     url: Env.supabaseUrl,
     anonKey: Env.supabaseAnonKey,
@@ -25,7 +28,7 @@ class ClubFlowApp extends ConsumerWidget {
 
     return MaterialApp.router(
       debugShowCheckedModeBanner: false,
-      title: 'ClubFlow',
+      title: 'ClubHub',
       routerConfig: router,
       theme: ThemeData(
         fontFamily: 'Inter',

@@ -93,7 +93,6 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         path: '/club/permission-request/:requestId',
         builder: (context, state) => PermissionRequestDetailsScreen(requestId: state.pathParameters['requestId']!),
       ),
-      // GoRoute(path: '/proposal-approver', builder: (context, state) => const ProposalApproverHomeScreen()),
       GoRoute(
   path: '/proposal-approver',
   builder: (context, state) => const ProposalApproverDashboardScreen(),

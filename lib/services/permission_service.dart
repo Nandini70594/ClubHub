@@ -9,19 +9,19 @@ class PermissionService {
   String? get _currentUserId => _client.auth.currentUser?.id;
 
   String? getNextApproverRole(String currentRole) {
-  switch (currentRole) {
-    case 'proposal_approver':
-      return 'vertical_coordinator';
-    case 'vertical_coordinator':
-      return 'resource_incharge';
-    case 'resource_incharge':
-      return 'director';
-    case 'director':
-      return null;
-    default:
-      return null;
+    switch (currentRole) {
+      case 'proposal_approver':
+        return 'vertical_coordinator';
+      case 'vertical_coordinator':
+        return 'resource_incharge';
+      case 'resource_incharge':
+        return 'director';
+      case 'director':
+        return null;
+      default:
+        return null;
+    }
   }
-}
 
   Future<PermissionRequestModel?> getLatestPermissionRequestForEvent(
     String eventId,
@@ -29,15 +29,15 @@ class PermissionService {
     final data = await _client
         .from('permission_requests')
         .select('''
-  *,
-  events (
-    title,
-    club_id,
-    clubs (
-      name
-    )
-  )
-''')
+          *,
+          events (
+            title,
+            club_id,
+            clubs (
+              name
+            )
+          )
+        ''')
         .eq('event_id', eventId)
         .order('requested_at', ascending: false)
         .limit(1)
@@ -51,15 +51,15 @@ class PermissionService {
     final data = await _client
         .from('permission_requests')
         .select('''
-  *,
-  events (
-    title,
-    club_id,
-    clubs (
-      name
-    )
-  )
-''')
+          *,
+          events (
+            title,
+            club_id,
+            clubs (
+              name
+            )
+          )
+        ''')
         .eq('id', requestId)
         .maybeSingle();
 
@@ -104,16 +104,20 @@ class PermissionService {
           'is_resubmission': false,
         })
         .select('''
-  *,
-  events (
-    title,
-    club_id,
-    clubs (
-      name
-    )
-  )
-''')
-        .single();
+          *,
+          events (
+            title,
+            club_id,
+            clubs (
+              name
+            )
+          )
+        ''')
+        .maybeSingle();
+
+    if (inserted == null) {
+      throw Exception('Permission request was not created.');
+    }
 
     final requestId = inserted['id'] as String;
 
@@ -154,16 +158,20 @@ class PermissionService {
           'is_resubmission': true,
         })
         .select('''
-  *,
-  events (
-    title,
-    club_id,
-    clubs (
-      name
-    )
-  )
-''')
-        .single();
+          *,
+          events (
+            title,
+            club_id,
+            clubs (
+              name
+            )
+          )
+        ''')
+        .maybeSingle();
+
+    if (inserted == null) {
+      throw Exception('Permission request was not resubmitted.');
+    }
 
     final requestId = inserted['id'] as String;
 
@@ -189,15 +197,15 @@ class PermissionService {
     final data = await _client
         .from('permission_requests')
         .select('''
-  *,
-  events (
-    title,
-    club_id,
-    clubs (
-      name
-    )
-  )
-''')
+          *,
+          events (
+            title,
+            club_id,
+            clubs (
+              name
+            )
+          )
+        ''')
         .eq('status', 'PENDING')
         .eq('current_approver_role', role)
         .order('requested_at', ascending: false);
@@ -212,177 +220,172 @@ class PermissionService {
   }
 
   Future<List<PermissionRequestModel>> getReviewedRequestsForRole(
-  String role,
-) async {
-  final actions = await _client
-      .from('permission_request_actions')
-      .select('permission_request_id, acted_at')
-      .eq('acted_by_role', role)
-      .order('acted_at', ascending: false);
+    String role,
+  ) async {
+    final actions = await _client
+        .from('permission_request_actions')
+        .select('permission_request_id, acted_at')
+        .eq('acted_by_role', role)
+        .order('acted_at', ascending: false);
 
-  if ((actions as List).isEmpty) return [];
+    if ((actions as List).isEmpty) return [];
 
-  final requestIds = actions
-      .map((e) => e['permission_request_id'] as String)
-      .toSet()
-      .toList();
+    final requestIds = actions
+        .map((e) => e['permission_request_id'] as String)
+        .toSet()
+        .toList();
 
-  final data = await _client
-      .from('permission_requests')
-      .select('''
-  *,
-  events (
-    title,
-    club_id,
-    clubs (
-      name
-    )
-  )
-''')
-      .inFilter('id', requestIds);
+    final data = await _client
+        .from('permission_requests')
+        .select('''
+          *,
+          events (
+            title,
+            club_id,
+            clubs (
+              name
+            )
+          )
+        ''')
+        .inFilter('id', requestIds);
 
-  final requests = (data as List)
-      .map((e) => PermissionRequestModel.fromMap(e as Map<String, dynamic>))
-      .toList();
+    final requests = (data as List)
+        .map((e) => PermissionRequestModel.fromMap(e as Map<String, dynamic>))
+        .toList();
 
-  requests.sort((a, b) {
-    final aAction = actions.firstWhere(
-      (x) => x['permission_request_id'] == a.id,
-      orElse: () => {'acted_at': ''},
-    );
-    final bAction = actions.firstWhere(
-      (x) => x['permission_request_id'] == b.id,
-      orElse: () => {'acted_at': ''},
-    );
+    requests.sort((a, b) {
+      final aAction = actions.firstWhere(
+        (x) => x['permission_request_id'] == a.id,
+        orElse: () => {'acted_at': ''},
+      );
+      final bAction = actions.firstWhere(
+        (x) => x['permission_request_id'] == b.id,
+        orElse: () => {'acted_at': ''},
+      );
 
-    final aTime = aAction['acted_at']?.toString() ?? '';
-    final bTime = bAction['acted_at']?.toString() ?? '';
+      final aTime = aAction['acted_at']?.toString() ?? '';
+      final bTime = bAction['acted_at']?.toString() ?? '';
 
-    return bTime.compareTo(aTime);
-  });
+      return bTime.compareTo(aTime);
+    });
 
-  return requests;
-}
+    return requests;
+  }
 
   Future<void> approveRequest({
-  required String requestId,
-  required String currentRole,
-  String? remarks,
-}) async {
-  final nextRole = getNextApproverRole(currentRole);
-  final userId = _currentUserId;
-  if (userId == null) throw Exception('User not logged in');
+    required String requestId,
+    required String currentRole,
+    String? remarks,
+  }) async {
+    final nextRole = getNextApproverRole(currentRole);
+    final userId = _currentUserId;
+    if (userId == null) throw Exception('User not logged in');
 
-  await _client.from('permission_request_actions').insert({
-    'permission_request_id': requestId,
-    'acted_by': userId,
-    'acted_by_role': currentRole,
-    'action': 'APPROVED',
-    'remarks': remarks,
-  });
+    await _client.from('permission_request_actions').insert({
+      'permission_request_id': requestId,
+      'acted_by': userId,
+      'acted_by_role': currentRole,
+      'action': 'APPROVED',
+      'remarks': remarks,
+    });
 
-  if (nextRole == null) {
-  await _client
-      .from('permission_requests')
-      .update({
-        'status': 'APPROVED',
-        'current_approver_role': null,
-        'decision_remarks': remarks,
-        'decided_by_role': currentRole,
-        'decided_at': DateTime.now().toUtc().toIso8601String(),
-      })
-      .eq('id', requestId);
+    if (nextRole == null) {
+      await _client
+          .from('permission_requests')
+          .update({
+            'status': 'APPROVED',
+            'current_approver_role': null,
+            'decision_remarks': remarks,
+            'decided_by_role': currentRole,
+            'decided_at': DateTime.now().toUtc().toIso8601String(),
+          })
+          .eq('id', requestId);
 
-  final request = await getRequestById(requestId);
+      final request = await getRequestById(requestId);
 
-  if (request != null) {
-    await _client
-        .from('stages')
-        .update({
-          'status': 'approved',
-          'remarks': remarks,
-          'completed_at': DateTime.now().toUtc().toIso8601String(),
-        })
-        .eq('event_id', request.eventId)
-        .eq('stage_number', 3);
+      if (request != null) {
+        await _client
+            .from('stages')
+            .update({
+              'status': 'approved',
+              'remarks': remarks,
+              'completed_at': DateTime.now().toUtc().toIso8601String(),
+            })
+            .eq('event_id', request.eventId)
+            .eq('stage_number', 3);
 
-    await _client
-        .from('stages')
-        .update({'status': 'pending'})
-        .eq('event_id', request.eventId)
-        .eq('stage_number', 4);
+        await _client
+            .from('stages')
+            .update({'status': 'pending'})
+            .eq('event_id', request.eventId)
+            .eq('stage_number', 4);
 
-    await _client
-        .from('events')
-        .update({
-          'current_stage': 4,
-          'progress_pct': 65,
-        })
-        .eq('id', request.eventId);
+        await _client
+            .from('events')
+            .update({
+              'current_stage': 4,
+              'progress_pct': 65,
+            })
+            .eq('id', request.eventId);
+      }
+    } else {
+      await _client
+          .from('permission_requests')
+          .update({
+            'current_approver_role': nextRole,
+            'decision_remarks': remarks,
+          })
+          .eq('id', requestId);
+    }
   }
-} else {
-  await _client
-      .from('permission_requests')
-      .update({
-        'current_approver_role': nextRole,
-        'decision_remarks': remarks,
-      })
-      .eq('id', requestId);
-}
-}
 
   Future<void> rejectRequest({
-  required String requestId,
-  required String currentRole,
-  String? remarks,
-}) async {
-  final userId = _currentUserId;
-  if (userId == null) throw Exception('User not logged in');
+    required String requestId,
+    required String currentRole,
+    String? remarks,
+  }) async {
+    final userId = _currentUserId;
+    if (userId == null) throw Exception('User not logged in');
 
-  // 1. Store action (for reviewed tab)
-  await _client.from('permission_request_actions').insert({
-    'permission_request_id': requestId,
-    'acted_by': userId,
-    'acted_by_role': currentRole,
-    'action': 'REJECTED',
-    'remarks': remarks,
-  });
+    await _client.from('permission_request_actions').insert({
+      'permission_request_id': requestId,
+      'acted_by': userId,
+      'acted_by_role': currentRole,
+      'action': 'REJECTED',
+      'remarks': remarks,
+    });
 
-  // 2. Update main request
-  await _client
-      .from('permission_requests')
-      .update({
-        'status': 'REJECTED',
-        'current_approver_role': null,
-        'decision_remarks': remarks,
-        'decided_by_role': currentRole,
-        'decided_at': DateTime.now().toUtc().toIso8601String(),
-      })
-      .eq('id', requestId);
-
-  // 3. Get eventId using request
-  final request = await getRequestById(requestId);
-
-  if (request != null) {
-    // 4. Update Stage 3 → rejected
     await _client
-        .from('stages')
+        .from('permission_requests')
         .update({
-          'status': 'rejected',
-          'remarks': remarks,
-          'completed_at': DateTime.now().toUtc().toIso8601String(),
+          'status': 'REJECTED',
+          'current_approver_role': null,
+          'decision_remarks': remarks,
+          'decided_by_role': currentRole,
+          'decided_at': DateTime.now().toUtc().toIso8601String(),
         })
-        .eq('event_id', request.eventId)
-        .eq('stage_number', 3);
+        .eq('id', requestId);
 
-    // 5. Move event back to stage 3
-    await _client
-        .from('events')
-        .update({
-          'current_stage': 3,
-          'progress_pct': 45,
-        })
-        .eq('id', request.eventId);
+    final request = await getRequestById(requestId);
+
+    if (request != null) {
+      await _client
+          .from('stages')
+          .update({
+            'status': 'rejected',
+            'remarks': remarks,
+            'completed_at': DateTime.now().toUtc().toIso8601String(),
+          })
+          .eq('event_id', request.eventId)
+          .eq('stage_number', 3);
+
+      await _client
+          .from('events')
+          .update({
+            'current_stage': 3,
+            'progress_pct': 45,
+          })
+          .eq('id', request.eventId);
+    }
   }
-}
 }

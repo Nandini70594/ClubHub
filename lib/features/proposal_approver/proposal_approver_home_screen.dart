@@ -6,7 +6,6 @@ import '../../models/event_model.dart';
 import '../../providers/auth_provider.dart';
 import '../../widgets/app_scaffold.dart';
 
-// ── ERPTheme tokens (same as permission screen) ──────────────────────────
 class ERPTheme {
   static const Color primary = Color(0xFF3D52A0);
   static const Color primaryLight = Color(0xFF7091E6);
@@ -333,7 +332,6 @@ class _ProposalApproverHomeScreenState extends ConsumerState<ProposalApproverHom
             appBar: _buildAppBar('Proposal Approver'),
             body: TabBarView(
               children: [
-                // ── Pending Tab ──
                 FutureBuilder<List<EventModel>>(
                   key: ValueKey('proposal_pending_$_reloadKey'),
                   future: pendingFuture,
@@ -365,7 +363,6 @@ class _ProposalApproverHomeScreenState extends ConsumerState<ProposalApproverHom
                   },
                 ),
 
-                // ── Reviewed Tab ──
                 FutureBuilder<List<EventModel>>(
                   key: ValueKey('proposal_reviewed_$_reloadKey'),
                   future: reviewedFuture,

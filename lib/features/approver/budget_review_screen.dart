@@ -149,7 +149,7 @@ class _BudgetReviewScreenState extends ConsumerState<BudgetReviewScreen> {
           onPressed: () => Navigator.pop(context),
         ),
         title: const Text(
-          'Budget Review',
+          'ClubHub',
           style: TextStyle(
               fontSize: 17, fontWeight: FontWeight.w700, color: Colors.white),
         ),
@@ -160,7 +160,6 @@ class _BudgetReviewScreenState extends ConsumerState<BudgetReviewScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
 
-            // ── Summary card ───────────────────────────────────────────
             _SurfaceCard(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -218,7 +217,6 @@ class _BudgetReviewScreenState extends ConsumerState<BudgetReviewScreen> {
                     value: budget.approvalNumber ?? 'Not generated yet',
                   ),
 
-                  // File row
                   if (budget.fileName != null) ...[
                     const SizedBox(height: 12),
                     Divider(height: 1, color: Colors.grey.shade100),
@@ -275,7 +273,6 @@ class _BudgetReviewScreenState extends ConsumerState<BudgetReviewScreen> {
               ),
             ),
 
-            // ── Remarks field (pending only) ───────────────────────────
             if (isPending) ...[
               const SizedBox(height: 22),
               _SectionLabel(label: 'Remarks'),
@@ -296,7 +293,6 @@ class _BudgetReviewScreenState extends ConsumerState<BudgetReviewScreen> {
                 ),
               ),
 
-              // ── Action buttons ─────────────────────────────────────
               const SizedBox(height: 22),
               _SectionLabel(label: 'Decision'),
               const SizedBox(height: 12),
@@ -337,7 +333,6 @@ class _BudgetReviewScreenState extends ConsumerState<BudgetReviewScreen> {
   }
 }
 
-// ── Shared widgets ────────────────────────────────────────────────────────────
 class _SurfaceCard extends StatelessWidget {
   final Widget child;
   const _SurfaceCard({required this.child});

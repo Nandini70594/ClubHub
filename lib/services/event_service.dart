@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../models/activity_log_model.dart';
@@ -16,14 +17,16 @@ class EventService {
         .from('users')
         .select('club_id')
         .eq('id', authUser.id)
-        .single();
+        .maybeSingle();
+
+    if (userRow == null) return [];
 
     final clubId = userRow['club_id'];
     if (clubId == null) return [];
 
     final data = await _client
         .from('events')
-        .select()
+        .select('*, clubs(*)')
         .eq('club_id', clubId)
         .order('created_at', ascending: false);
 
@@ -32,9 +35,7 @@ class EventService {
         .toList();
   }
 
-  Future<List<EventModel>> getPendingProposalEventsForRole(
-    String role,
-  ) async {
+  Future<List<EventModel>> getPendingProposalEventsForRole(String role) async {
     final data = await _client
         .from('events')
         .select('*, clubs(*)')
@@ -51,11 +52,36 @@ class EventService {
     final authUser = _client.auth.currentUser;
     if (authUser == null) return [];
 
+    final userRow = await _client
+        .from('users')
+        .select('role')
+        .eq('id', authUser.id)
+        .maybeSingle();
+
+    final role = userRow?['role']?.toString();
+    if (role == null) return [];
+
+    if (role == 'vertical_coordinator') {
+      final data = await _client
+          .from('events')
+          .select('*, clubs(*)')
+          .eq('proposal_status', 'approved')
+          .order('proposal_approved_at', ascending: false);
+
+      return (data as List)
+          .map((e) => EventModel.fromMap(e as Map<String, dynamic>))
+          .toList();
+    }
+
     final data = await _client
         .from('events')
         .select('*, clubs(*)')
         .eq('proposal_approved_by', authUser.id)
-        .inFilter('proposal_status', ['approved', 'changes_requested', 'rejected'])
+        .inFilter('proposal_status', [
+          'approved',
+          'changes_requested',
+          'rejected',
+        ])
         .order('proposal_approved_at', ascending: false);
 
     return (data as List)
@@ -76,6 +102,8 @@ class EventService {
       'proposal_status': 'changes_requested',
       'proposal_current_approver_role': 'proposal_approver',
       'proposal_remarks': remarks,
+      'proposal_approved_by': authUser.id,
+      'proposal_approved_at': DateTime.now().toUtc().toIso8601String(),
     }).eq('id', eventId);
 
     await _client.from('activity_log').insert({
@@ -123,7 +151,11 @@ class EventService {
           )
         ''')
         .eq('approved_by', authUser.id)
-        .inFilter('status', ['approved', 'changes_requested', 'rejected'])
+        .inFilter('status', [
+          'approved',
+          'changes_requested',
+          'rejected',
+        ])
         .order('approved_at', ascending: false);
 
     return (data as List)
@@ -161,7 +193,11 @@ class EventService {
         .from('users')
         .select('club_id')
         .eq('id', authUser.id)
-        .single();
+        .maybeSingle();
+
+    if (userRow == null) {
+      throw Exception('User profile not found.');
+    }
 
     final clubId = userRow['club_id'];
     if (clubId == null) {
@@ -184,7 +220,11 @@ class EventService {
           'created_by': authUser.id,
         })
         .select()
-        .single();
+        .maybeSingle();
+
+    if (inserted == null) {
+      throw Exception('Event was not created. Please try again.');
+    }
 
     final eventId = inserted['id'] as String;
 
@@ -259,7 +299,11 @@ class EventService {
         .select('status, proposal_status')
         .eq('id', eventId)
         .eq('created_by', authUser.id)
-        .single();
+        .maybeSingle();
+
+    if (oldEvent == null) {
+      throw Exception('Event not found or you are not allowed to edit it.');
+    }
 
     if (oldEvent['proposal_status'] != 'pending' &&
         oldEvent['proposal_status'] != 'changes_requested') {
@@ -295,10 +339,16 @@ class EventService {
         .select('proposal_status')
         .eq('id', eventId)
         .eq('created_by', authUser.id)
-        .single();
+        .maybeSingle();
+
+    if (event == null) {
+      throw Exception('Event not found or you are not allowed to resubmit it.');
+    }
 
     if (event['proposal_status'] != 'changes_requested') {
-      throw Exception('Proposal can only be resubmitted after changes requested.');
+      throw Exception(
+        'Proposal can only be resubmitted after changes requested.',
+      );
     }
 
     await _client
@@ -336,88 +386,89 @@ class EventService {
   }
 
   Future<void> approveProposal({
-    required String eventId,
-    required String remarks,
-  }) async {
-    final authUser = _client.auth.currentUser;
-    if (authUser == null) {
-      throw Exception('User not logged in');
-    }
-
-    final event = await _client
-        .from('events')
-        .select('proposal_current_approver_role')
-        .eq('id', eventId)
-        .single();
-
-    final currentRole = event['proposal_current_approver_role'];
-
-    if (currentRole == 'proposal_approver') {
-      await _client
-          .from('events')
-          .update({
-            'proposal_current_approver_role': 'vertical_coordinator',
-            'proposal_remarks': remarks,
-          })
-          .eq('id', eventId)
-          .eq('proposal_status', 'pending');
-
-      await _client.from('activity_log').insert({
-        'event_id': eventId,
-        'user_id': authUser.id,
-        'action': 'Proposal forwarded to vertical coordinator',
-        'old_status': 'proposal_pending',
-        'new_status': 'vertical_coordinator_review',
-      });
-    } else if (currentRole == 'vertical_coordinator') {
-      final updatedEvent = await _client
-          .from('events')
-          .update({
-            'proposal_status': 'approved',
-            'proposal_current_approver_role': null,
-            'proposal_approved_by': authUser.id,
-            'proposal_approved_at': DateTime.now().toUtc().toIso8601String(),
-            'proposal_remarks': remarks,
-            'current_stage': 2,
-            'progress_pct': 25,
-          })
-          .eq('id', eventId)
-          .eq('proposal_status', 'pending')
-          .select()
-          .maybeSingle();
-
-      if (updatedEvent == null) {
-        throw Exception('Proposal approval failed. Event row was not updated.');
-      }
-
-      await _client
-          .from('stages')
-          .update({
-            'status': 'approved',
-            'approved_by': authUser.id,
-            'remarks': remarks,
-            'completed_at': DateTime.now().toUtc().toIso8601String(),
-          })
-          .eq('event_id', eventId)
-          .eq('stage_number', 1);
-
-      await _client
-          .from('stages')
-          .update({'status': 'pending'})
-          .eq('event_id', eventId)
-          .eq('stage_number', 2);
-
-      await _client.from('activity_log').insert({
-        'event_id': eventId,
-        'user_id': authUser.id,
-        'action': 'Proposal approved by vertical coordinator',
-        'old_status': 'vertical_coordinator_review',
-        'new_status': 'proposal_approved',
-      });
-    } else {
-      throw Exception('Invalid proposal approval state.');
-    }
+  required String eventId,
+  required String remarks,
+}) async {
+  final authUser = _client.auth.currentUser;
+  if (authUser == null) {
+    throw Exception('User not logged in');
   }
+
+  final event = await _client
+      .from('events')
+      .select('proposal_current_approver_role, proposal_status')
+      .eq('id', eventId)
+      .maybeSingle();
+
+  if (event == null) {
+    throw Exception('Event not found for id: $eventId');
+  }
+
+  final currentRole = event['proposal_current_approver_role']?.toString();
+  final proposalStatus = event['proposal_status']?.toString();
+
+  if (proposalStatus != 'pending') {
+    throw Exception('This proposal is not pending. Current status: $proposalStatus');
+  }
+
+  if (currentRole == 'proposal_approver') {
+    await _client
+        .from('events')
+        .update({
+          'proposal_current_approver_role': 'vertical_coordinator',
+          'proposal_remarks': remarks,
+        })
+        .eq('id', eventId);
+
+    await _client.from('activity_log').insert({
+      'event_id': eventId,
+      'user_id': authUser.id,
+      'action': 'Proposal forwarded to vertical coordinator',
+      'old_status': 'proposal_pending',
+      'new_status': 'vertical_coordinator_review',
+    });
+  } else if (currentRole == 'vertical_coordinator') {
+    await _client
+        .from('events')
+        .update({
+          'proposal_status': 'approved',
+          'proposal_current_approver_role': null,
+          'proposal_approved_by': authUser.id,
+          'proposal_approved_at': DateTime.now().toUtc().toIso8601String(),
+          'proposal_remarks': remarks,
+          'current_stage': 2,
+          'progress_pct': 25,
+        })
+        .eq('id', eventId);
+
+    await _client
+        .from('stages')
+        .update({
+          'status': 'approved',
+          'approved_by': authUser.id,
+          'remarks': remarks,
+          'completed_at': DateTime.now().toUtc().toIso8601String(),
+        })
+        .eq('event_id', eventId)
+        .eq('stage_number', 1);
+
+    await _client
+        .from('stages')
+        .update({'status': 'pending'})
+        .eq('event_id', eventId)
+        .eq('stage_number', 2);
+
+    await _client.from('activity_log').insert({
+      'event_id': eventId,
+      'user_id': authUser.id,
+      'action': 'Proposal approved by vertical coordinator',
+      'old_status': 'vertical_coordinator_review',
+      'new_status': 'proposal_approved',
+    });
+  } else {
+    throw Exception('Invalid approver role for this proposal: $currentRole');
+  }
+}
 
   Future<void> rejectProposal({
     required String eventId,
@@ -430,6 +481,7 @@ class EventService {
         .from('events')
         .update({
           'proposal_status': 'rejected',
+          'proposal_current_approver_role': null,
           'proposal_approved_by': authUser.id,
           'proposal_approved_at': DateTime.now().toUtc().toIso8601String(),
           'proposal_remarks': remarks,
@@ -565,7 +617,11 @@ class EventService {
         .from('events')
         .select('created_by')
         .eq('id', eventId)
-        .single();
+        .maybeSingle();
+
+    if (event == null) {
+      throw Exception('Event not found.');
+    }
 
     if (event['created_by'] != authUser.id) {
       throw Exception('Not allowed');
@@ -589,8 +645,17 @@ class EventService {
   }
 
   Future<EventModel> getEventById(String eventId) async {
-    final data =
-        await _client.from('events').select().eq('id', eventId).single();
+    debugPrint('GET EVENT BY ID = $eventId');
+
+    final data = await _client
+        .from('events')
+        .select('*, clubs(*)')
+        .eq('id', eventId)
+        .maybeSingle();
+
+    if (data == null) {
+      throw Exception('Event not found for id: $eventId');
+    }
 
     return EventModel.fromMap(data);
   }
@@ -647,7 +712,11 @@ class EventService {
         .from('events')
         .select('proposal_status')
         .eq('id', eventId)
-        .single();
+        .maybeSingle();
+
+    if (event == null) {
+      throw Exception('Event not found.');
+    }
 
     if (event['proposal_status'] != 'approved') {
       throw Exception('Budget can only be submitted after proposal approval.');
@@ -698,19 +767,20 @@ class EventService {
         .select('*, clubs(*)')
         .eq('status', 'closed');
 
-    // Club based filtering - only for club_lead and proposal_approver
     if (role == 'club_lead' || role == 'proposal_approver') {
       final user = await _client
           .from('users')
           .select('club_id')
           .eq('id', authUser.id)
-          .single();
+          .maybeSingle();
+
+      if (user == null) return [];
 
       final clubId = user['club_id'];
-      if (clubId == null) return []; // safety
+      if (clubId == null) return [];
+
       query = query.eq('club_id', clubId);
     }
-    // For vertical_coordinator, admin, and other roles, show all clubs
 
     final data = await query.order('created_at', ascending: false);
 

@@ -152,7 +152,7 @@ class _ExpenseReviewScreenState extends ConsumerState<ExpenseReviewScreen> {
           onPressed: () => Navigator.pop(context),
         ),
         title: const Text(
-          'Expense Review',
+          'ClubHub',
           style: TextStyle(
             color: Colors.white,
             fontWeight: FontWeight.w600,
@@ -181,7 +181,6 @@ class _ExpenseReviewScreenState extends ConsumerState<ExpenseReviewScreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      // ── Expense Header Card ────────────────────────────────────
                       Container(
                         width: double.infinity,
                         padding: const EdgeInsets.all(18),
@@ -226,7 +225,6 @@ class _ExpenseReviewScreenState extends ConsumerState<ExpenseReviewScreen> {
 
                       const SizedBox(height: 20),
 
-                      // ── Expense Details Card ───────────────────────────────────
                       Container(
                         width: double.infinity,
                         padding: const EdgeInsets.all(16),
@@ -266,7 +264,6 @@ class _ExpenseReviewScreenState extends ConsumerState<ExpenseReviewScreen> {
 
                       const SizedBox(height: 20),
 
-                      // ── Supporting Files Card ─────────────────────────────────
                       Container(
                         width: double.infinity,
                         padding: const EdgeInsets.all(16),
@@ -416,7 +413,6 @@ class _ExpenseReviewScreenState extends ConsumerState<ExpenseReviewScreen> {
 
                       const SizedBox(height: 20),
 
-                      // ── Action Buttons ───────────────────────────────────────
                       if (isPending)
                         _loading
                             ? const Center(

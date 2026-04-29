@@ -125,7 +125,6 @@ class _EventArchiveScreenState extends ConsumerState<EventArchiveScreen> {
           appBar: _buildAppBar('Event Archive'),
           body: Column(
             children: [
-              // Search bar
               Container(
                 color: Colors.white,
                 padding: const EdgeInsets.all(16),
@@ -185,7 +184,6 @@ class _EventArchiveScreenState extends ConsumerState<EventArchiveScreen> {
                 ),
               ),
 
-              // Results count
               if (_filteredEvents.isNotEmpty)
                 Padding(
                   padding: const EdgeInsets.symmetric(
@@ -202,8 +200,6 @@ class _EventArchiveScreenState extends ConsumerState<EventArchiveScreen> {
                     ),
                   ),
                 ),
-
-              // List
               Expanded(
                 child: _filteredEvents.isEmpty
                     ? Center(

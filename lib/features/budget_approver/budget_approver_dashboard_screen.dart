@@ -140,7 +140,6 @@ class _BudgetApproverDashboardScreenState
               },
             ),
 
-            // ── Reviewed Tab ──
             FutureBuilder<List<BudgetModel>>(
               key: ValueKey('budget_reviewed_$_reloadKey'),
               future: reviewedFuture,

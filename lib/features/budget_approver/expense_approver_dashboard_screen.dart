@@ -4,7 +4,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../models/event_expense_model.dart';
 import '../../providers/auth_provider.dart';
 import '../../widgets/app_scaffold.dart';
-// Note: AppScaffold removed, using custom Scaffold with gradient header
 import '../approver/expense_review_screen.dart';
 
 class ExpenseApproverDashboardScreen extends ConsumerStatefulWidget {
@@ -49,7 +48,6 @@ class _ExpenseApproverDashboardScreenState
   }
 
   Future<void> _viewExpenseFiles(EventExpenseModel expense) async {
-    // Navigate to the expense review screen to view files
     Navigator.push(
       context,
       MaterialPageRoute(
@@ -123,7 +121,6 @@ class _ExpenseApproverDashboardScreenState
             },
           ),
 
-          // ── Reviewed Tab ──
           FutureBuilder<List<EventExpenseModel>>(
             key: ValueKey('expense_reviewed_$_reloadKey'),
             future: reviewedFuture,

@@ -26,7 +26,6 @@ class _ClubDashboardScreenState extends ConsumerState<ClubDashboardScreen> {
     final userAsync   = ref.watch(currentUserProfileProvider);
     final clubAsync   = ref.watch(currentClubProvider);
     final clubName    = clubAsync.whenOrNull(data: (c) => c?.clubName);
-    final headerTitle = clubName ?? 'Club Dashboard';
 
     return userAsync.when(
       loading: () => const AppScaffold(
@@ -48,7 +47,7 @@ class _ClubDashboardScreenState extends ConsumerState<ClubDashboardScreen> {
         return DefaultTabController(
           length: 2,
           child: AppScaffold(
-            title: headerTitle,
+            title: 'ClubHub',
             currentRoute: AppRoutes.club,
             child: Column(
               children: [
@@ -85,8 +84,6 @@ class _ClubDashboardScreenState extends ConsumerState<ClubDashboardScreen> {
     );
   }
 }
-
-// ── Active Events tab ─────────────────────────────────────────────────────────
 
 class _ActiveEventsTab extends ConsumerWidget {
   final int reloadKey;
@@ -138,10 +135,6 @@ class _ActiveEventsTab extends ConsumerWidget {
   }
 }
 
-// ── Past Events tab ───────────────────────────────────────────────────────────
-// Uses ConsumerStatefulWidget so the TextEditingController and fetched data
-// live in State — they survive parent setStates and tab switches.
-
 class _PastEventsTab extends ConsumerStatefulWidget {
   final String role;
   final Future<void> Function() onRefresh;
@@ -167,7 +160,6 @@ class _PastEventsTabState extends ConsumerState<_PastEventsTab> {
   }
 
   void _onSearch() {
-    // Debounce search to prevent excessive rebuilds
     _debounceTimer?.cancel();
     _debounceTimer = Timer(const Duration(milliseconds: 300), () {
       if (mounted) {
@@ -210,7 +202,6 @@ class _PastEventsTabState extends ConsumerState<_PastEventsTab> {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        // Search bar — lives in State, never recreated on re-render
         Padding(
           padding: const EdgeInsets.fromLTRB(16, 12, 16, 4),
           child: TextField(
@@ -246,7 +237,6 @@ class _PastEventsTabState extends ConsumerState<_PastEventsTab> {
               ),
             ),
             onChanged: (value) {
-              // Update query immediately for visual feedback
               final newQuery = value.toLowerCase();
               if (_query != newQuery) {
                 _debounceTimer?.cancel();
@@ -260,7 +250,6 @@ class _PastEventsTabState extends ConsumerState<_PastEventsTab> {
           ),
         ),
 
-        // Event list
         Expanded(
           child: _loading
               ? const Center(child: CircularProgressIndicator(color: Color(0xFF3B5BDB)))
@@ -298,8 +287,6 @@ class _PastEventsTabState extends ConsumerState<_PastEventsTab> {
     );
   }
 }
-
-// ── Shared sub-widgets ────────────────────────────────────────────────────────
 
 class _EventCard extends StatelessWidget {
   final EventModel event;

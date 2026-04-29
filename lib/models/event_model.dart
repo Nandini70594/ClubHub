@@ -41,29 +41,37 @@ class EventModel {
     this.clubCode,
   });
 
+  static int _toInt(dynamic value, {int fallback = 0}) {
+    if (value == null) return fallback;
+    if (value is int) return value;
+    if (value is num) return value.toInt();
+    return int.tryParse(value.toString()) ?? fallback;
+  }
+
   factory EventModel.fromMap(Map<String, dynamic> map) {
-    final club = map['clubs'] as Map<String, dynamic>?;
+    final club = map['clubs'] is Map<String, dynamic>
+        ? map['clubs'] as Map<String, dynamic>
+        : null;
 
     return EventModel(
-      id: map['id'] as String,
-      clubId: map['club_id'] as String,
-      title: map['title'] as String,
-      description: map['description'] as String?,
-      eventDate: map['event_date'] as String,
-      venue: map['venue'] as String?,
-      status: map['status'] as String,
-      currentStage: map['current_stage'] as int,
-      progressPct: map['progress_pct'] as int,
-      createdBy: map['created_by'] as String,
-      createdAt: map['created_at'] as String?,
-      proposalStatus: (map['proposal_status'] as String?) ?? 'pending',
-      proposalCurrentApproverRole:
-          map['proposal_current_approver_role'] as String?,
-      proposalApprovedBy: map['proposal_approved_by'] as String?,
-      proposalApprovedAt: map['proposal_approved_at'] as String?,
-      proposalRemarks: map['proposal_remarks'] as String?,
-      clubName: club?['club_name'] as String?,
-      clubCode: club?['club_code'] as String?,
+      id: map['id']?.toString() ?? '',
+      clubId: map['club_id']?.toString() ?? '',
+      title: map['title']?.toString() ?? 'Untitled Event',
+      description: map['description']?.toString(),
+      eventDate: map['event_date']?.toString() ?? '',
+      venue: map['venue']?.toString(),
+      status: map['status']?.toString() ?? 'proposal_submitted',
+      currentStage: _toInt(map['current_stage'], fallback: 1),
+      progressPct: _toInt(map['progress_pct'], fallback: 10),
+      createdBy: map['created_by']?.toString() ?? '',
+      createdAt: map['created_at']?.toString(),
+      proposalStatus: map['proposal_status']?.toString() ?? 'pending',
+      proposalCurrentApproverRole: map['proposal_current_approver_role']?.toString(),
+      proposalApprovedBy: map['proposal_approved_by']?.toString(),
+      proposalApprovedAt: map['proposal_approved_at']?.toString(),
+      proposalRemarks: map['proposal_remarks']?.toString(),
+      clubName: club?['club_name']?.toString() ?? club?['name']?.toString(),
+      clubCode: club?['club_code']?.toString() ?? club?['code']?.toString(),
     );
   }
 }

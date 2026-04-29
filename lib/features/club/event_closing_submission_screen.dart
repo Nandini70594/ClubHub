@@ -164,7 +164,6 @@ class _EventClosingSubmissionScreenState extends ConsumerState<EventClosingSubmi
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Event details info card
                 Container(
                   padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(

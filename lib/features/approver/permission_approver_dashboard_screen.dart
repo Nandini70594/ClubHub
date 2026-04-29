@@ -41,7 +41,6 @@ class ERPTheme {
     end: Alignment.bottomRight,
   );
 }
-// ────────────────────────────────────────────────────────────────────────────
 
 class PermissionApproverDashboardScreen extends ConsumerStatefulWidget {
   const PermissionApproverDashboardScreen({super.key});
@@ -371,7 +370,7 @@ const SizedBox(height: 6),
         return DefaultTabController(
           length: 2,
           child: AppScaffold(
-            title: 'Resource Incharge',
+            title: 'ClubHub',
             currentRoute: '/permission-approver',
             child: Scaffold(
               backgroundColor: ERPTheme.bgPage,
@@ -382,7 +381,7 @@ const SizedBox(height: 6),
                   decoration: BoxDecoration(gradient: ERPTheme.headerGradient),
                 ),
                 title: const Text(
-                  'Permission Approver',
+                  'ClubHub',
                   style: TextStyle(
                     color: Colors.white,
                     fontWeight: FontWeight.w600,

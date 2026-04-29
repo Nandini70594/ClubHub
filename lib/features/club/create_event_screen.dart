@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import '../../core/router/app_router.dart';
 import '../../models/event_model.dart';
 import '../../providers/auth_provider.dart';
@@ -54,7 +55,12 @@ class _CreateEventScreenState extends ConsumerState<CreateEventScreen> {
         );
       }
       if (!mounted) return;
-      Navigator.pop(context, true);
+
+WidgetsBinding.instance.addPostFrameCallback((_) {
+  if (context.mounted) {
+    context.go(AppRoutes.club);
+  }
+});
     } catch (e) {
       setState(() { _error = e.toString(); });
     } finally {
@@ -75,14 +81,8 @@ class _CreateEventScreenState extends ConsumerState<CreateEventScreen> {
   Widget build(BuildContext context) {
     return AppScaffold(
       title: isEditMode ? 'Edit Event' : 'Create Event',
-      currentRoute: AppRoutes.createEvent,
+      currentRoute: AppRoutes.club,
       showBottomNav: true,
-      actions: [
-        IconButton(
-          icon: const Icon(Icons.close, size: 20, color: Color(0xFF1A1F36)),
-          onPressed: () => Navigator.pop(context),
-        ),
-      ],
       child: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
         child: Column(

@@ -11,8 +11,6 @@ class PermissionRequestModel {
   final String? decidedAt;
   final String? parentRequestId;
   final bool isResubmission;
-
-  // New fields
   final String? clubName;
   final String? eventTitle;
 

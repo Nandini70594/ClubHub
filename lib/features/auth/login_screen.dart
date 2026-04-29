@@ -45,7 +45,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       }
 
       final route = initialRouteForRole(profile.role);
-      // Replace login so the user can't press back to it
       context.go(route);
     } catch (e) {
       setState(() => _error = e.toString());
@@ -115,7 +114,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                 const SizedBox(height: 20),
                 _InputField(
                   controller: emailCtrl,
-                  hint: 'you@institution.edu',
+                  hint: 'you@vit.edu',
                   icon: Icons.mail_outline,
                   keyboardType: TextInputType.emailAddress,
                 ),
@@ -145,21 +144,19 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              // Brand
               Container(
                 width: 64, height: 64,
                 decoration: BoxDecoration(color: _primary, borderRadius: BorderRadius.circular(16)),
                 child: const Icon(Icons.hub_outlined, color: Colors.white, size: 32),
               ),
               const SizedBox(height: 16),
-              const Text('ClubFlow',
+              const Text('ClubHub',
                   style: TextStyle(fontSize: 26, fontWeight: FontWeight.w700, color: Color(0xFF1A1F36), letterSpacing: -0.5)),
               const SizedBox(height: 4),
               Text('Sign in to your account',
                   style: TextStyle(fontSize: 14, color: Colors.grey.shade600)),
               const SizedBox(height: 36),
 
-              // Card
               Container(
                 padding: const EdgeInsets.all(24),
                 decoration: BoxDecoration(
@@ -175,7 +172,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     const SizedBox(height: 6),
                     _InputField(
                       controller: _emailController,
-                      hint: 'you@institution.edu',
+                      hint: 'you@vit.edu',
                       icon: Icons.mail_outline,
                       keyboardType: TextInputType.emailAddress,
                     ),
@@ -216,8 +213,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     );
   }
 }
-
-// ── Shared small widgets ──────────────────────────────────────────────────────
 
 class _InputField extends StatelessWidget {
   final TextEditingController controller;

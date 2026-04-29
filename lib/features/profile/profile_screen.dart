@@ -16,7 +16,6 @@ class ProfileScreen extends ConsumerStatefulWidget {
 class _ProfileScreenState extends ConsumerState<ProfileScreen> {
   static const _primary = Color(0xFF3B5BDB);
 
-  // Change-password form
   final _currentPwCtrl = TextEditingController();
   final _newPwCtrl = TextEditingController();
   final _confirmPwCtrl = TextEditingController();
@@ -60,9 +59,6 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     setState(() => _pwLoading = true);
 
     try {
-      // Supabase doesn't expose "verify current password" on client SDK directly.
-      // The safest approach without edge functions: re-authenticate by signing in
-      // again with the current password, then update.
       final userEmail = Supabase.instance.client.auth.currentUser?.email ?? '';
 
       await Supabase.instance.client.auth.signInWithPassword(
@@ -116,11 +112,8 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
           child: ListView(
             padding: const EdgeInsets.all(20),
             children: [
-              // ── Avatar + name card ──────────────────────────────────
               _ProfileCard(user: user, clubAsync: clubAsync),
               const SizedBox(height: 20),
-
-              // ── Change password ─────────────────────────────────────
               _SectionHeader(title: 'Change password'),
               const SizedBox(height: 12),
               _PasswordField(
@@ -145,7 +138,6 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
               ),
               const SizedBox(height: 16),
 
-              // Error / success messages
               if (_pwError != null)
                 _MessageBanner(message: _pwError!, isError: true),
               if (_pwSuccess != null)
@@ -188,10 +180,8 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
   }
 }
 
-// ── Sub-widgets ──────────────────────────────────────────────────────────────
-
 class _ProfileCard extends StatelessWidget {
-  final dynamic user; // AppUser
+  final dynamic user; 
   final AsyncValue clubAsync;
 
   const _ProfileCard({required this.user, required this.clubAsync});
@@ -211,7 +201,6 @@ class _ProfileCard extends StatelessWidget {
       ),
       child: Row(
         children: [
-          // Avatar circle
           Container(
             width: 60,
             height: 60,
@@ -247,7 +236,6 @@ class _ProfileCard extends StatelessWidget {
                   style: TextStyle(fontSize: 13, color: Colors.grey.shade500),
                 ),
                 const SizedBox(height: 6),
-                // Role badge
                 Container(
                   padding:
                       const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
@@ -263,7 +251,6 @@ class _ProfileCard extends StatelessWidget {
                         color: _primary),
                   ),
                 ),
-                // Club name for club_lead
                 if (clubName != null) ...[
                   const SizedBox(height: 4),
                   Text(

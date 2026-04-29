@@ -7,7 +7,6 @@ import '../../models/permission_request_model.dart';
 import '../../providers/auth_provider.dart';
 import '../../widgets/app_scaffold.dart';
 
-// ── Design tokens ────────────────────────────────────────────────────────────
 const _kPrimary    = Color(0xFF3B5BDB);
 const _kPrimaryBg  = Color(0xFFEEF2FF);
 const _kSurface    = Colors.white;
@@ -15,7 +14,6 @@ const _kBackground = Color(0xFFF4F6FB);
 const _kTextDark   = Color(0xFF1A1F36);
 const _kBorder     = Color(0xFFE5E7EB);
 const _kRadius     = 12.0;
-// ─────────────────────────────────────────────────────────────────────────────
 
 class PermissionRequestDetailsScreen extends ConsumerWidget {
   final String requestId;
@@ -54,7 +52,6 @@ class PermissionRequestDetailsScreen extends ConsumerWidget {
     return '${dt.day}/${dt.month}/${dt.year} • $hour:$min $amPm';
   }
 
-  // Status badge colours
   ({Color bg, Color fg}) _statusColors(String status) {
     final s = status.toLowerCase();
     if (s.contains('approved')) {
@@ -137,13 +134,10 @@ class PermissionRequestDetailsScreen extends ConsumerWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-
-                // ── Summary card ─────────────────────────────────────────
                 _SurfaceCard(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      // Purpose + status badge
                       Row(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
@@ -181,7 +175,6 @@ class PermissionRequestDetailsScreen extends ConsumerWidget {
                       Divider(height: 1, color: Colors.grey.shade100),
                       const SizedBox(height: 14),
 
-                      // Meta rows
                       _DetailRow(
                         icon: Icons.person_outline,
                         label: 'Current Approver',
@@ -202,7 +195,6 @@ class PermissionRequestDetailsScreen extends ConsumerWidget {
                         ),
                       ],
 
-                      // Decision remarks
                       if (request.decisionRemarks?.isNotEmpty == true) ...[
                         const SizedBox(height: 12),
                         Container(
@@ -231,7 +223,6 @@ class PermissionRequestDetailsScreen extends ConsumerWidget {
                         ),
                       ],
 
-                      // Resubmission badge
                       if (request.isResubmission) ...[
                         const SizedBox(height: 10),
                         Container(
@@ -257,7 +248,6 @@ class PermissionRequestDetailsScreen extends ConsumerWidget {
 
                 const SizedBox(height: 22),
 
-                // ── Resources ────────────────────────────────────────────
                 _SectionLabel(label: 'Selected Resources'),
                 const SizedBox(height: 10),
 
@@ -281,7 +271,6 @@ class PermissionRequestDetailsScreen extends ConsumerWidget {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          // Resource type header
                           Row(
                             children: [
                               Container(
@@ -332,7 +321,6 @@ class PermissionRequestDetailsScreen extends ConsumerWidget {
                             ),
                           ],
 
-                          // Document button / placeholder
                           if (item.documentName != null &&
                               item.documentName!.isNotEmpty) ...[
                             const SizedBox(height: 12),
@@ -392,7 +380,6 @@ class PermissionRequestDetailsScreen extends ConsumerWidget {
   }
 }
 
-// ── Shared small widgets ──────────────────────────────────────────────────────
 class _SurfaceCard extends StatelessWidget {
   final Widget child;
   const _SurfaceCard({required this.child});

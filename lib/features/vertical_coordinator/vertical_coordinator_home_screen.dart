@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../widgets/app_scaffold.dart';
+import '../approver/approver_dashboard_screen.dart';
+import '../approver/permission_approver_dashboard_screen.dart';
 
 class VerticalCoordinatorHomeScreen extends StatelessWidget {
   const VerticalCoordinatorHomeScreen({super.key});
@@ -33,15 +35,27 @@ class VerticalCoordinatorHomeScreen extends StatelessWidget {
               icon: Icons.description_outlined,
               title: 'Event Proposals',
               subtitle: 'Review proposals forwarded by faculty',
-              onTap: () => context.push('/proposal-approver/proposals'),
-            ),
+onTap: () {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => const ApproverDashboardScreen(),
+      ),
+    );
+  },            ),
             const SizedBox(height: 12),
             _NavCard(
               icon: Icons.assignment_turned_in_outlined,
               title: 'Resource Permissions',
               subtitle: 'Review permission requests',
-              onTap: () => context.push('/permission-approver'),
-            ),
+ onTap: () {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => const PermissionApproverDashboardScreen(),
+      ),
+    );
+  },            ),
             const SizedBox(height: 12),
             _NavCard(
               icon: Icons.archive_outlined,

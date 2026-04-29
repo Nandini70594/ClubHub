@@ -32,7 +32,6 @@ class BudgetModel {
   });
 
   factory BudgetModel.fromMap(Map<String, dynamic> map) {
-    // Extract club name from joined data
     String? clubName;
     if (map['events'] != null && map['events']['clubs'] != null) {
       clubName = map['events']['clubs']['name'] as String?;

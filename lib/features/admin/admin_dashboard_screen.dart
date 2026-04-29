@@ -24,7 +24,6 @@ class _AdminDashboardScreenState extends ConsumerState<AdminDashboardScreen>
 
   late final TabController _tabController;
 
-  // ── Club form ────────────────────────────────────────────────────────────
   final _clubNameCtrl = TextEditingController();
   final _clubCodeCtrl = TextEditingController();
   final _departmentController = TextEditingController();
@@ -32,7 +31,6 @@ class _AdminDashboardScreenState extends ConsumerState<AdminDashboardScreen>
   String? _clubError;
   String? _clubSuccess;
 
-  // ── User form ────────────────────────────────────────────────────────────
   final _authIdCtrl  = TextEditingController();
   final _emailCtrl   = TextEditingController();
   final _nameCtrl    = TextEditingController();
@@ -42,7 +40,6 @@ class _AdminDashboardScreenState extends ConsumerState<AdminDashboardScreen>
   String? _userError;
   String? _userSuccess;
 
-  // ── Data ─────────────────────────────────────────────────────────────────
   int _reloadKey = 0;
 
   @override
@@ -121,11 +118,10 @@ class _AdminDashboardScreenState extends ConsumerState<AdminDashboardScreen>
   @override
   Widget build(BuildContext context) {
     return AppScaffold(
-      title: 'Admin',
+      title: 'ClubHub',
       currentRoute: AppRoutes.admin,
       child: Column(
         children: [
-          // Tab bar
           Container(
             color: Colors.white,
             child: TabBar(
@@ -194,8 +190,6 @@ class _AdminDashboardScreenState extends ConsumerState<AdminDashboardScreen>
   }
 }
 
-// ── Overview tab ──────────────────────────────────────────────────────────────
-
 class _OverviewTab extends StatelessWidget {
   final List<ClubModel> clubs;
   final List<AppUser>   users;
@@ -214,7 +208,6 @@ class _OverviewTab extends StatelessWidget {
     return ListView(
       padding: const EdgeInsets.all(16),
       children: [
-        // Stats row
         Row(
           children: [
             _StatCard(label: 'Total Clubs', value: '${clubs.length}', icon: Icons.business_outlined, color: _primary),
@@ -224,13 +217,11 @@ class _OverviewTab extends StatelessWidget {
         ),
         const SizedBox(height: 20),
 
-        // Clubs list
         _SectionHeader(title: 'Clubs (${clubs.length})'),
         const SizedBox(height: 8),
         ...clubs.map((c) => _ClubTile(club: c)),
         const SizedBox(height: 20),
 
-        // Users list
         _SectionHeader(title: 'Users (${users.length})'),
         const SizedBox(height: 8),
         ...users.map((u) => _UserTile(user: u)),
@@ -372,8 +363,6 @@ class _UserTile extends StatelessWidget {
   }
 }
 
-// ── Add Club tab ──────────────────────────────────────────────────────────────
-
 class _AddClubTab extends StatelessWidget {
   final TextEditingController nameCtrl, codeCtrl;
   final bool loading;
@@ -404,8 +393,6 @@ class _AddClubTab extends StatelessWidget {
     );
   }
 }
-
-// ── Add User tab ──────────────────────────────────────────────────────────────
 
 class _AddUserTab extends StatelessWidget {
   final TextEditingController authIdCtrl, emailCtrl, nameCtrl;
@@ -449,12 +436,11 @@ class _AddUserTab extends StatelessWidget {
         const SizedBox(height: 16),
         _Field(controller: authIdCtrl, label: 'Auth User ID (Supabase UID)', hint: 'uuid from Supabase Auth', icon: Icons.key_outlined),
         const SizedBox(height: 14),
-        _Field(controller: emailCtrl,  label: 'Email',     hint: 'user@institution.edu', icon: Icons.mail_outline,    keyboard: TextInputType.emailAddress),
+        _Field(controller: emailCtrl,  label: 'Email',     hint: 'user@vit.edu', icon: Icons.mail_outline,    keyboard: TextInputType.emailAddress),
         const SizedBox(height: 14),
-        _Field(controller: nameCtrl,   label: 'Full Name', hint: 'Prof. John Doe',        icon: Icons.person_outline),
+        _Field(controller: nameCtrl,   label: 'Full Name', hint: 'Your Name',        icon: Icons.person_outline),
         const SizedBox(height: 14),
 
-        // Role dropdown
         _DropdownLabel(label: 'Role'),
         const SizedBox(height: 6),
         _StyledDropdown<String>(
@@ -464,7 +450,6 @@ class _AddUserTab extends StatelessWidget {
           hint: 'Select role',
         ),
 
-        // Club dropdown (only for club_lead and proposal_approver)
         if (_needsClub) ...[
           const SizedBox(height: 14),
           _DropdownLabel(label: 'Assign Club'),
@@ -488,8 +473,6 @@ class _AddUserTab extends StatelessWidget {
     );
   }
 }
-
-// ── Shared small widgets ──────────────────────────────────────────────────────
 
 class _SectionHeader extends StatelessWidget {
   final String title;

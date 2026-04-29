@@ -136,7 +136,6 @@ class _EventExpenseSubmissionScreenState extends ConsumerState<EventExpenseSubmi
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Event info card
                 Container(
                   padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(12), border: Border.all(color: Colors.grey.shade100)),

@@ -29,7 +29,6 @@ class _ProposalApproverDashboardScreenState
           children: [
             const SizedBox(height: 20),
             
-            // Main functionality cards
             Row(
               children: [
                 Expanded(

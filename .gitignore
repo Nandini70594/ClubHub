@@ -43,3 +43,18 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
+
+# Sensitive / env files
+.env
+.env.*
+lib/core/config/env.dart
+
+# Android secrets
+android/local.properties
+key.properties
+*.jks
+*.keystore
+
+# Build outputs
+*.apk
+*.aab

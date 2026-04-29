@@ -100,7 +100,6 @@ class _EventDetailScreenState extends ConsumerState<EventDetailScreen> {
           final permissionRequest = data[3] as PermissionRequestModel?;
           final canOpenPermissions = budget != null && budget.status == 'approved';
 
-          // Get current user role to hide stage tracker for vertical coordinator
           final currentUser = ref.read(currentUserProfileProvider).value;
           final isVerticalCoordinator = currentUser?.role == 'vertical_coordinator';
 
@@ -113,7 +112,6 @@ class _EventDetailScreenState extends ConsumerState<EventDetailScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // ── Event header card ──────────────────────────────────
                   _InfoCard(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -166,7 +164,6 @@ class _EventDetailScreenState extends ConsumerState<EventDetailScreen> {
                     ),
                   ),
 
-                  // Proposal action buttons
                   if (event.proposalStatus == 'pending' || event.proposalStatus == 'changes_requested') ...[
                     const SizedBox(height: 10),
                     _ActionButton(
@@ -190,10 +187,7 @@ class _EventDetailScreenState extends ConsumerState<EventDetailScreen> {
                       },
                     ),
                   ],
-
                   const SizedBox(height: 20),
-
-                  // ── Budget section ─────────────────────────────────────
                   SectionLabel(label: 'Budget'),
                   const SizedBox(height: 12),
                   if (event.proposalStatus != 'approved')
@@ -217,10 +211,7 @@ class _EventDetailScreenState extends ConsumerState<EventDetailScreen> {
                         if (submitted == true) await _reload();
                       } : null,
                     ),
-
                   const SizedBox(height: 20),
-
-                  // ── Permissions section ────────────────────────────────
                   SectionLabel(label: 'Permissions'),
                   const SizedBox(height: 12),
                   if (!canOpenPermissions)
@@ -248,10 +239,7 @@ class _EventDetailScreenState extends ConsumerState<EventDetailScreen> {
                         if (submitted == true) await _reload();
                       } : null,
                     ),
-
                   const SizedBox(height: 20),
-
-                  // ── Event Conduction ───────────────────────────────────
                   SectionLabel(label: 'Event Conduction'),
                   const SizedBox(height: 12),
                   if (event.currentStage < 4)
@@ -267,10 +255,7 @@ class _EventDetailScreenState extends ConsumerState<EventDetailScreen> {
                     )
                   else
                     _CompletedBanner(message: 'Event has been marked as conducted.'),
-
                   const SizedBox(height: 20),
-
-                  // ── Expense Verification ───────────────────────────────
                   SectionLabel(label: 'Expense Verification'),
                   const SizedBox(height: 12),
                   if (event.currentStage < 5)
@@ -286,10 +271,7 @@ class _EventDetailScreenState extends ConsumerState<EventDetailScreen> {
                     )
                   else
                     _CompletedBanner(message: 'Expense proofs submitted and verified.'),
-
                   const SizedBox(height: 20),
-
-                  // ── Closing File ───────────────────────────────────────
                   SectionLabel(label: 'Closing File'),
                   const SizedBox(height: 12),
                   if (event.currentStage < 6)
@@ -305,10 +287,7 @@ class _EventDetailScreenState extends ConsumerState<EventDetailScreen> {
                     )
                   else
                     _CompletedBanner(message: 'Event closing file submitted. Event closed.'),
-
                   const SizedBox(height: 20),
-
-                  // ── Stage Tracker (hidden for vertical coordinator) ───────
                   if (!isVerticalCoordinator) ...[
                     SectionLabel(label: 'Stage Tracker'),
                     const SizedBox(height: 12),
@@ -324,8 +303,6 @@ class _EventDetailScreenState extends ConsumerState<EventDetailScreen> {
     );
   }
 }
-
-// ── Sub-widgets ──────────────────────────────────────────────────────────────
 
 class _InfoCard extends StatelessWidget {
   final Widget child;

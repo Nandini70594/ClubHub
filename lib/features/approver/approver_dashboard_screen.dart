@@ -59,7 +59,7 @@ class _ApproverDashboardScreenState
             elevation: 0,
             surfaceTintColor: Colors.transparent,
             title: const Text(
-              'Event Proposals',
+              'ClubHub',
               style: TextStyle(
                 fontSize: 17,
                 fontWeight: FontWeight.w700,
@@ -97,7 +97,6 @@ class _ApproverDashboardScreenState
           body: TabBarView(
             controller: _tabController,
             children: [
-              // ── Pending Tab ──
               FutureBuilder<List<EventModel>>(
                 key: ValueKey('proposal_pending_$_reloadKey'),
                 future: pendingFuture,
@@ -128,7 +127,6 @@ class _ApproverDashboardScreenState
                 },
               ),
 
-              // ── Reviewed Tab ──
               FutureBuilder<List<EventModel>>(
                 key: ValueKey('proposal_reviewed_$_reloadKey'),
                 future: reviewedFuture,

@@ -10,7 +10,6 @@ import '../../models/permission_request_model.dart';
 import '../../providers/auth_provider.dart';
 import '../../widgets/app_scaffold.dart';
 
-// ── Design tokens ────────────────────────────────────────────────────────────
 const _kPrimary    = Color(0xFF3B5BDB);
 const _kPrimaryBg  = Color(0xFFEEF2FF);
 const _kSurface    = Colors.white;
@@ -19,7 +18,6 @@ const _kTextDark   = Color(0xFF1A1F36);
 const _kTextMid    = Color(0xFF6B7280);
 const _kBorder     = Color(0xFFE5E7EB);
 const _kRadius     = 12.0;
-// ─────────────────────────────────────────────────────────────────────────────
 
 class PermissionRequestScreen extends ConsumerStatefulWidget {
   final String eventId;
@@ -194,7 +192,6 @@ class _PermissionRequestScreenState
     }
   }
 
-  // ── Build ──────────────────────────────────────────────────────────────────
   @override
   Widget build(BuildContext context) {
     final eventService = ref.read(eventServiceProvider);
@@ -235,7 +232,6 @@ class _PermissionRequestScreenState
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // ── Event details card ───────────────────────────────────
                 _SectionLabel(label: 'Request Details'),
                 const SizedBox(height: 10),
                 _SurfaceCard(
@@ -264,7 +260,6 @@ class _PermissionRequestScreenState
 
                 const SizedBox(height: 22),
 
-                // ── Resources ────────────────────────────────────────────
                 _SectionLabel(label: 'Resources Required'),
                 const SizedBox(height: 10),
 
@@ -282,7 +277,6 @@ class _PermissionRequestScreenState
 
                 const SizedBox(height: 22),
 
-                // ── Purpose ──────────────────────────────────────────────
                 _SectionLabel(label: 'Purpose of Resource Usage'),
                 const SizedBox(height: 10),
                 _SurfaceCard(
@@ -302,7 +296,6 @@ class _PermissionRequestScreenState
 
                 const SizedBox(height: 28),
 
-                // ── Submit button ─────────────────────────────────────────
                 SizedBox(
                   width: double.infinity,
                   height: 48,
@@ -344,7 +337,6 @@ class _PermissionRequestScreenState
   }
 }
 
-// ── Resource tile ─────────────────────────────────────────────────────────────
 class _ResourceTile extends StatelessWidget {
   final String type;
   final String label;
@@ -376,7 +368,6 @@ class _ResourceTile extends StatelessWidget {
         padding: EdgeInsets.zero,
         child: Column(
           children: [
-            // Header row with checkbox
             InkWell(
               onTap: () => onToggle(!isSelected),
               borderRadius: BorderRadius.circular(_kRadius),
@@ -419,7 +410,6 @@ class _ResourceTile extends StatelessWidget {
               ),
             ),
 
-            // Expanded fields when selected
             if (isSelected) ...[
               Divider(height: 1, color: Colors.grey.shade100),
               Padding(
@@ -439,7 +429,6 @@ class _ResourceTile extends StatelessWidget {
                       maxLines: 2,
                     ),
                     const SizedBox(height: 10),
-                    // Document upload row
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
                       decoration: BoxDecoration(
@@ -495,7 +484,6 @@ class _ResourceTile extends StatelessWidget {
   }
 }
 
-// ── Shared small widgets ──────────────────────────────────────────────────────
 class _SurfaceCard extends StatelessWidget {
   final Widget child;
   final EdgeInsetsGeometry? padding;

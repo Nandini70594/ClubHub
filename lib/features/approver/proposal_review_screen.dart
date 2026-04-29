@@ -7,7 +7,6 @@ import '../../models/stage_model.dart';
 import '../../providers/auth_provider.dart';
 import '../../widgets/app_scaffold.dart';
 
-// ── ERPTheme tokens (same as other screens) ────────────────────────────────
 class ERPTheme {
   static const Color primary = Color(0xFF3D52A0);
   static const Color primaryLight = Color(0xFF7091E6);
@@ -295,7 +294,6 @@ class _ProposalReviewScreenState extends ConsumerState<ProposalReviewScreen> {
           final stages = data[1] as List<StageModel>;
           final logs = data[2] as List<ActivityLogModel>;
 
-          // Get current user role
           final currentUser = ref.read(currentUserProfileProvider).value;
           final isAdmin = currentUser?.role == 'admin';
           final isVerticalCoordinator = currentUser?.role == 'vertical_coordinator';
@@ -305,7 +303,6 @@ class _ProposalReviewScreenState extends ConsumerState<ProposalReviewScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // ── Event Header Card ────────────────────────────────────
                 Container(
                   width: double.infinity,
                   padding: const EdgeInsets.all(18),
@@ -336,7 +333,6 @@ class _ProposalReviewScreenState extends ConsumerState<ProposalReviewScreen> {
 
                 const SizedBox(height: 16),
 
-                // ── Event Details Card ───────────────────────────────────
                 Container(
                   width: double.infinity,
                   padding: const EdgeInsets.all(16),
@@ -356,7 +352,6 @@ class _ProposalReviewScreenState extends ConsumerState<ProposalReviewScreen> {
 
                 const SizedBox(height: 20),
 
-                // ── Stage Tracker (hidden for vertical coordinator) ────────
                 if (!isVerticalCoordinator) ...[
                   _sectionTitle('Stage Tracker'),
 
@@ -379,7 +374,6 @@ class _ProposalReviewScreenState extends ConsumerState<ProposalReviewScreen> {
                                 child: Row(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    // Timeline column
                                     SizedBox(
                                       width: 56,
                                       child: Column(
@@ -418,7 +412,6 @@ class _ProposalReviewScreenState extends ConsumerState<ProposalReviewScreen> {
                                         ],
                                       ),
                                     ),
-                                    // Content
                                     Expanded(
                                       child: Padding(
                                         padding: EdgeInsets.only(
@@ -473,7 +466,6 @@ class _ProposalReviewScreenState extends ConsumerState<ProposalReviewScreen> {
                   const SizedBox(height: 20),
                 ],
 
-                // ── Remarks Field ────────────────────────────────────────
                 if (event.proposalStatus == 'pending') ...[
                   _sectionTitle('Add Remarks'),
                   Container(
@@ -498,7 +490,6 @@ class _ProposalReviewScreenState extends ConsumerState<ProposalReviewScreen> {
                     ),
                   ),
                   const SizedBox(height: 16),
-                  // ── Action Buttons ───────────────────────────────────
                   _loading
                       ? const Center(
                           child: CircularProgressIndicator(
@@ -582,7 +573,6 @@ class _ProposalReviewScreenState extends ConsumerState<ProposalReviewScreen> {
                   const SizedBox(height: 24),
                 ],
 
-                // ── Activity Log (Admin only) ───────────────────────────────────────
                 if (isAdmin) ...[
                   _sectionTitle('Activity Log'),
 

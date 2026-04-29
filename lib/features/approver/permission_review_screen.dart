@@ -473,7 +473,6 @@ class _PermissionReviewScreenState
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // ── Status Banner ──────────────────────────────────────────
                 Container(
                   width: double.infinity,
                   padding: const EdgeInsets.symmetric(
@@ -505,7 +504,6 @@ class _PermissionReviewScreenState
 
                 const SizedBox(height: 16),
 
-                // ── Request Details Card ───────────────────────────────────
                 Container(
                   width: double.infinity,
                   padding: const EdgeInsets.all(16),
@@ -539,7 +537,6 @@ class _PermissionReviewScreenState
 
                 const SizedBox(height: 20),
 
-                // ── Selected Resources ─────────────────────────────────────
                 _sectionTitle('Selected Resources'),
 
                 if (items.isEmpty)
@@ -655,7 +652,6 @@ class _PermissionReviewScreenState
 
                 const SizedBox(height: 24),
 
-                // ── Action Buttons ─────────────────────────────────────────
                 if (widget.request.status == 'PENDING' &&
                     widget.request.currentApproverRole == user.role)
                   _isSubmitting
