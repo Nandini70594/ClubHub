@@ -32,9 +32,3 @@ flutter run
 - Resource permission requests with document uploads
 - Role-based dashboards for approvers and coordinators
 - Event archive with search
-
----
-
-## License
-
-For internal/academic use.
