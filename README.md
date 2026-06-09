@@ -28,7 +28,8 @@ flutter run
 
 ## Features
 
-- Event proposal creation and multi-stage approval workflow
+- Event proposal creation with budget submission
+- multi-stage approval workflow
 - Resource permission requests with document uploads
 - Role-based dashboards for approvers and coordinators
 - Event archive with search
