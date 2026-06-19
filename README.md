@@ -1,4 +1,4 @@
-# Institute ERP — Mobile App
+# ClubHub - Mobile App for College Clubs
 
 A Flutter mobile application for managing college event workflows, including event proposals, multi-level approvals, and resource permission requests.
 
